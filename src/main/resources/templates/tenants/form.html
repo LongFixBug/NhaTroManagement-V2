@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/_layout :: html(pageTitle=${tenant.id == null ? #messages.msg('tenant.add.title') : #messages.msg('tenant.edit.title.withName', tenant.name)}, content=~{::content})}" lang="en">
+
+<th:block th:fragment="content">
+    <h2 th:if="${tenant.id == null}" th:text="#{tenant.add.title}">Add Tenant</h2>
+    <h2 th:unless="${tenant.id == null}" th:text="${#messages.msg('tenant.edit.title.withName', tenant.name)}">Edit Tenant</h2>
+        <form th:action="@{/tenants/save}" th:object="${tenant}" method="post">
+        <input type="hidden" th:field="*{id}"/>
+
+        <div class="mb-3">
+            <label for="name" class="form-label" th:text="#{tenant.name.label}">Tenant Name:</label>
+            <input type="text" th:field="*{name}" class="form-control" id="name" th:placeholder="#{tenant.name.placeholder}" required/>
+            <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="text-danger">Name Error</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" th:text="#{button.save.tenant}">Save Tenant</button>
+        <a th:href="@{/tenants}" class="btn btn-secondary" th:text="#{button.cancel}">Cancel</a>
+    </form>
+</th:block>
+
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security6" th:replace="~{fragments/_layout :: html(#{settings.title}, ~{::section})}">
+<head>
+    <title th:text="#{settings.title}">Application Settings</title>
+</head>
+<body>
+<section>
+    <div class="container mt-4">
+        <h2 th:text="#{settings.title}">Application Settings</h2>
+
+
+        <form th:action="@{/settings/save}" method="post" class="mt-3">
+            <div class="mb-3">
+                <label for="electricityPrice" class="form-label" th:text="#{settings.electricityPrice.label}">Electricity Price (VND/kWh)</label>
+                <input type="number" step="any" class="form-control" id="electricityPrice" name="ELECTRICITY_PRICE" th:value="${electricityPrice}" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="waterPrice" class="form-label" th:text="#{settings.waterPrice.label}">Water Price (VND/m³)</label>
+                <input type="number" step="any" class="form-control" id="waterPrice" name="WATER_PRICE" th:value="${waterPrice}" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary" th:text="#{settings.button.save}">Save Settings</button>
+        </form>
+    </div>
+</section>
+</body>
+</html>

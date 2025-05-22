@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/_layout :: html(pageTitle=#{tenant.list.title}, content=~{::content})}" lang="en">
+
+<th:block th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 th:text="#{tenant.list.title}">Tenant List</h2>
+        <a th:href="@{/tenants/add}" class="btn btn-primary" th:text="#{tenant.add.title}">Add New Tenant</a>
+    </div>
+
+    <div th:if="${#lists.isEmpty(tenants)}" class="alert alert-info">
+        <span th:text="#{tenant.list.empty}">No tenants found. Please add a new tenant.</span>
+    </div>
+
+    <table class="table table-striped table-hover" th:unless="${#lists.isEmpty(tenants)}">
+        <thead>
+        <tr>
+            <th th:text="#{general.id}">ID</th>
+            <th th:text="#{tenant.name}">Name</th>
+            <th th:text="#{general.actions}">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="tenant : ${tenants}">
+            <td th:text="${tenant.id}"></td>
+            <td th:text="${tenant.name}"></td>
+            <td>
+                <a th:href="@{/tenants/edit/{id}(id=${tenant.id})}" class="btn btn-sm btn-outline-secondary" th:text="#{button.edit}">Edit</a>
+                <a th:href="@{/tenants/delete/{id}(id=${tenant.id})}" class="btn btn-sm btn-outline-danger"
+                   th:attr="data-confirm-text=#{confirm.delete.tenant.text}" onclick="return confirm(this.getAttribute('data-confirm-text'))" th:text="#{button.delete}">Delete</a>
+                <a th:href="@{/bills/add/{tenantId}(tenantId=${tenant.id})}" class="btn btn-sm btn-outline-success" th:text="#{button.create.bill}">Create Bill</a>
+                <a th:href="@{/bills/tenant/{tenantId}(tenantId=${tenant.id})}" class="btn btn-sm btn-outline-info" th:text="#{button.view.bills}">View Bills</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</th:block>
+
+</html>

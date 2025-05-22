@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security6" th:fragment="html (pageTitle, content)" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${pageTitle != null ? pageTitle : 'NhaTro Management'}">NhaTro Management</title>
+    <!-- Bootswatch Cosmo Theme -->
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/cosmo/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link th:href="@{/css/custom.css}" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            padding-top: 5rem; /* Account for fixed navbar */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Ensure body takes full viewport height */
+        }
+        main.container {
+            flex: 1; /* Allow main content to grow and push footer down */
+        }
+        .navbar-brand { font-weight: bold; }
+        /* .container { max-width: 960px; } */ /* Let main.container handle its own width, footer.container can be separate */
+        .alert { margin-top: 1rem; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/}" th:text="#{app.title}">NhaTro Management</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarDefault"
+                aria-controls="navbarDefault" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarDefault">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/tenants}" th:text="#{nav.tenants}">Tenants</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/bills}">All Bills</a>
+                </li>
+                <!-- Settings Link - Admin Only -->
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link" th:href="@{/settings}" th:text="#{nav.settings}">Settings</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+                <!-- Login/Logout Section -->
+                <li class="nav-item" sec:authorize="!isAuthenticated()">
+                    <a class="nav-link" th:href="@{/login}" th:text="#{nav.login}">Login</a>
+                </li>
+
+                <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span th:text="#{nav.logged_in_as}">Logged in as:</span> <span sec:authentication="name">Username</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li>
+                            <form th:action="@{/logout}" method="post" class="d-inline">
+                                <button type="submit" class="dropdown-item" th:text="#{nav.logout}">Logout</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+
+                 <li class="nav-item">
+                    <button id="themeToggleButton" class="btn btn-outline-light btn-sm" type="button">
+                        <i class="bi bi-sun-fill"></i> <!-- Default to sun icon, JS will update -->
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container">
+    <!-- Success Message -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show auto-hide-alert" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Error Message -->
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show auto-hide-alert" role="alert">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div th:replace="${content}">
+        <!-- Page-specific content will be inserted here -->
+    </div>
+</main>
+
+<footer class="container mt-5 py-3 border-top text-center">
+    <p>&copy; NhaTro Management <span th:text="${#dates.year(#dates.createNow())}"></span></p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+<script th:src="@{/js/theme-toggle.js}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const autoHideAlerts = document.querySelectorAll('.auto-hide-alert');
+        autoHideAlerts.forEach(function(alert) {
+            setTimeout(function() {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 3000); // Hide after 3 seconds (3000 milliseconds)
+        });
+    });
+</script>
+</body>
+</html>

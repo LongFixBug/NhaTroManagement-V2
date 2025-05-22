@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/_layout :: html(pageTitle=#{app.title}, content=~{::content})}" lang="en">
+
+<th:block th:fragment="content">
+    <div class="px-4 py-5 my-5 text-center">
+        <h1 class="display-5 fw-bold" th:text="#{app.title}">Welcome to the Boarding House Management Application!</h1>
+        <div class="col-lg-6 mx-auto">
+            <p class="lead mb-4" th:text="#{app.description}">Manage your boarding house tenants and their monthly bills efficiently.</p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a th:href="@{/tenants}" class="btn btn-primary btn-lg px-4 gap-3"><span th:text="#{nav.tenants}">Go to Tenants</span></a>
+                <a th:href="@{/bills}" class="btn btn-outline-secondary btn-lg px-4"><span th:text="#{nav.bills.all}">Go to Bills</span></a>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+</html>

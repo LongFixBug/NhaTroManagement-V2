@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${pdfTitle}">Bill Details</title>
+    <style type="text/css">
+        body {
+            font-family: DejaVu Sans, Arial, sans-serif; /* DejaVu Sans for better Unicode support */
+            margin: 20px;
+            font-size: 12px;
+        }
+        .container {
+            width: 100%;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+        .total-amount {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .footer {
+            text-align: center;
+            font-size: 10px;
+            color: #777;
+            margin-top: 30px;
+        }
+        .label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 th:text="${pdfTitle}">Bill Details</h1>
+
+    <div class="section-title" th:text="#{bill.details.billInformationLabel ?: 'Bill Information'}">Bill Information</div>
+    <table>
+        <tr>
+            <td class="label" th:text="#{bill.details.billIdLabel ?: 'Bill ID:'}">Bill ID:</td>
+            <td th:text="${bill.id}"></td>
+        </tr>
+        <tr>
+            <td class="label" th:text="#{bill.details.tenantLabel ?: 'Room:'}">Room:</td>
+            <td th:text="${bill.tenant.name}"></td>
+        </tr>
+        <tr>
+            <td class="label" th:text="#{bill.details.occupantNameLabel ?: 'Occupant Name:'}">Occupant Name:</td>
+            <td th:text="${bill.occupantName}"></td>
+        </tr>
+        <tr>
+            <td class="label" th:text="#{bill.details.billingPeriodLabel ?: 'Billing Period:'}">Billing Period:</td>
+            <td th:text="${bill.billMonth + '/' + bill.billYear}"></td>
+        </tr>
+        <tr>
+            <td class="label" th:text="#{bill.details.generatedOnLabel ?: 'Generated on'}">Generated on:</td>
+            <td th:text="${bill.createdAt != null ? #temporals.format(bill.createdAt, 'dd/MM/yyyy HH:mm:ss', locale) : ''}"></td>
+        </tr>
+         <tr>
+            <td class="label" th:text="#{label.paid ?: 'Paid:'}">Paid:</td>
+            <td th:text="${bill.paid ? #{general.yes} : #{general.no}}"></td>
+        </tr>
+    </table>
+
+    <div class="section-title" th:text="#{bill.details.roomChargesTitle ?: 'Room Charges'}">Room Charges</div>
+    <table>
+        <tr>
+            <td class="label" th:text="#{bill.details.basicRoomRentLabel ?: 'Basic Room Rent:'}">Basic Room Rent:</td>
+            <td th:text="${#numbers.formatDecimal(bill.roomRent, 1, 'COMMA', 2, 'POINT')} + ' VND'"></td>
+        </tr>
+    </table>
+
+    <div class="section-title" th:text="#{bill.details.electricityTitle ?: 'Electricity'}">Electricity</div>
+    <table>
+        <tr>
+            <td class="label" th:text="#{bill.details.electricityPreviousLabel ?: 'Previous Reading (kWh):'}">Previous Reading (kWh):</td>
+            <td th:text="${bill.electricityKwhPrevious}"></td>
+        </tr>
+        <tr>
+            <td class="label" th:text="#{bill.details.electricityCurrentLabel ?: 'Current Reading (kWh):'}">Current Reading (kWh):</td>
+            <td th:text="${bill.electricityKwhCurrent}"></td>
+        </tr>
+        <tr>
+            <td class="label" th:text="#{bill.details.electricityUsageLabel ?: 'Usage (kWh):'}">Usage (kWh):</td>
+            <td th:text="${bill.electricityKwhCurrent - bill.electricityKwhPrevious}"></td>
+        </tr>
+        <tr>
+            <td class="label" th:text="#{bill.details.electricityPricePerKwhLabel ?: 'Price per kWh:'}">Price per kWh:</td>
+            <td th:text="${#numbers.formatDecimal(T(com.example.nhatromanagement.model.Bill).ELECTRICITY_PRICE_PER_KWH, 1, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+        </tr>
+        <tr>
+            <td class="label" th:text="#{bill.details.electricityCostLabel ?: 'Electricity Cost:'}">Electricity Cost:</td>
+            <td th:text="${#numbers.formatDecimal(bill.electricityCost, 1, 'COMMA', 2, 'POINT')} + ' VND'"></td>
+        </tr>
+    </table>
+
+    <div class="section-title" th:text="#{bill.details.waterTitle ?: 'Water'}">Water</div>
+    <table>
+        <tr>
+            <td class="label" th:text="#{bill.details.waterPreviousLabel ?: 'Previous Reading (m³):'}">Previous Reading (m³):</td>
+            <td th:text="${bill.waterM3Previous}"></td>
+        </tr>
+        <tr>
+            <td class="label" th:text="#{bill.details.waterCurrentLabel ?: 'Current Reading (m³):'}">Current Reading (m³):</td>
+            <td th:text="${bill.waterM3Current}"></td>
+        </tr>
+        <tr>
+            <td class="label" th:text="#{bill.details.waterUsageLabel ?: 'Usage (m³):'}">Usage (m³):</td>
+            <td th:text="${bill.waterM3Current - bill.waterM3Previous}"></td>
+        </tr>
+        <tr>
+            <td class="label" th:text="#{bill.details.waterPricePerM3Label ?: 'Price per m³:'}">Price per m³:</td>
+            <td th:text="${#numbers.formatDecimal(T(com.example.nhatromanagement.model.Bill).WATER_PRICE_PER_M3, 1, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+        </tr>
+        <tr>
+            <td class="label" th:text="#{bill.details.waterCostLabel ?: 'Water Cost:'}">Water Cost:</td>
+            <td th:text="${#numbers.formatDecimal(bill.waterCost, 1, 'COMMA', 2, 'POINT')} + ' VND'"></td>
+        </tr>
+    </table>
+
+    <div class="section-title" th:text="#{bill.details.otherFeesTitle ?: 'Other Fees'}">Other Fees</div>
+    <table>
+        <tr>
+            <td class="label" th:text="#{bill.details.trashFeeLabel ?: 'Trash Fee:'}">Trash Fee:</td>
+            <td th:text="${#numbers.formatDecimal(bill.trashFee, 1, 'COMMA', 2, 'POINT')} + ' VND'"></td>
+        </tr>
+        <tr>
+            <td class="label" th:text="#{bill.details.wifiFeeLabel ?: 'WiFi Fee:'}">WiFi Fee:</td>
+            <td th:text="${#numbers.formatDecimal(bill.wifiFee, 1, 'COMMA', 2, 'POINT')} + ' VND'"></td>
+        </tr>
+    </table>
+
+    <div class="section-title" th:text="#{bill.details.totalAmountDueLabel ?: 'Total Amount Due:'}">Total Amount Due:</div>
+    <table>
+        <tr>
+            <td class="label total-amount" th:text="#{bill.details.totalAmountDueLabel ?: 'Total Amount Due:'}">Total Amount Due:</td>
+            <td class="total-amount" th:text="${#numbers.formatDecimal(bill.totalAmount, 1, 'COMMA', 2, 'POINT')} + ' VND'"></td>
+        </tr>
+    </table>
+
+    <div class="footer">
+        <p th:text="#{bill.pdf.footer.generatedBy(${#strings.capitalize(appTitle)})}">Generated by NhaTroManagement</p>
+    </div>
+</div>
+</body>
+</html>
