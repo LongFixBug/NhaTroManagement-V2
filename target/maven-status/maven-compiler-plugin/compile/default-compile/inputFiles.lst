@@ -3,6 +3,7 @@
 /Users/nguyenhailong/Documents/project/NhaTroManagement/src/main/java/com/example/nhatromanagement/service/BillService.java
 /Users/nguyenhailong/Documents/project/NhaTroManagement/src/main/java/com/example/nhatromanagement/service/TenantService.java
 /Users/nguyenhailong/Documents/project/NhaTroManagement/src/main/java/com/example/nhatromanagement/service/SettingService.java
+/Users/nguyenhailong/Documents/project/NhaTroManagement/src/main/java/com/example/nhatromanagement/controller/LoginController.java
 /Users/nguyenhailong/Documents/project/NhaTroManagement/src/main/java/com/example/nhatromanagement/model/Setting.java
 /Users/nguyenhailong/Documents/project/NhaTroManagement/src/main/java/com/example/nhatromanagement/model/Bill.java
 /Users/nguyenhailong/Documents/project/NhaTroManagement/src/main/java/com/example/nhatromanagement/service/PdfService.java

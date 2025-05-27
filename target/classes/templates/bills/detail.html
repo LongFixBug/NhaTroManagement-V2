@@ -2,103 +2,160 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/_layout :: html(pageTitle=${pageTitle}, content=~{::content})}" lang="en">
 
 <th:block th:fragment="content">
-    <h2 th:text="${pageTitle}">Bill Details</h2>
+    <style>
+        .bill-container {
+            border: 1px solid #ccc;
+            padding: 20px;
+            max-width: 800px; /* Adjust as needed */
+            margin: 20px auto;
+            font-family: Arial, sans-serif; /* Or a font closer to the image */
+        }
+        .bill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        .bill-header .info {
+            border: 2px solid red;
+            padding: 10px;
+            text-align: center;
+        }
+        .bill-header .title {
+            text-align: right;
+        }
+        .bill-header .title h3 {
+            font-size: 1.8em;
+            color: red;
+            margin-bottom: 5px;
+        }
+        .bill-header .title p {
+            margin: 0;
+            font-size: 1.1em;
+        }
+        .bill-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .bill-table th, .bill-table td {
+            border: 1px solid red; /* Red grid lines */
+            padding: 8px;
+            text-align: left;
+        }
+        .bill-table th {
+            background-color: #f8f8f8; /* Light grey for header */
+            font-weight: bold;
+        }
+        .bill-table td.amount, .bill-table th.amount-header {
+            text-align: right;
+        }
+        .bill-footer {
+            text-align: right;
+            margin-top: 30px;
+            font-size: 1.1em;
+        }
+        .action-buttons {
+            margin-top: 20px;
+            text-align: center; /* Center the buttons */
+        }
+    </style>
 
-    <div class="card">
-        <div class="card-header">
-            <span th:text="#{bill.details.billIdLabel}">Bill ID:</span> <span th:text="${bill.id}"></span>
-        </div>
-        <div class="card-body">
-            <div class="row mb-2">
-                <div class="col-md-3"><strong th:text="#{bill.details.tenantLabel}">Tenant:</strong></div>
-                <div class="col-md-9" th:text="${bill.tenant.name}"></div>
+    <div class="bill-container">
+        <div class="bill-header">
+            <div class="info">
+                <strong>NHÀ TRỌ ANH ĐÀO 2</strong><br/>
+                ĐT: 0979 937 205
             </div>
-            <div class="row mb-2">
-                <div class="col-md-3"><strong th:text="#{bill.details.billingPeriodLabel}">Billing Period:</strong></div>
-                <div class="col-md-9" th:text="${bill.billMonth} + '/' + ${bill.billYear}"></div>
-            </div>
-
-            <hr/>
-            <h5 th:text="#{bill.details.roomChargesTitle}">Room Charges</h5>
-            <div class="row mb-1">
-                <div class="col-md-3"><span th:text="#{bill.details.basicRoomRentLabel}">Basic Room Rent:</span></div>
-                <div class="col-md-9 text-end" th:text="${#numbers.formatDecimal(bill.roomRent, 1, 'COMMA', 0, 'POINT') + ' VND'}"></div>
-            </div>
-
-            <hr/>
-            <h5 th:text="#{bill.details.electricityTitle}">Electricity</h5>
-            <div class="row mb-1">
-                <div class="col-md-3"><span th:text="#{bill.details.electricityPreviousLabel}">Previous Reading (kWh):</span></div>
-                <div class="col-md-9 text-end" th:text="${#numbers.formatDecimal(bill.electricityKwhPrevious, 1, 'COMMA', 1, 'POINT')}"></div>
-            </div>
-            <div class="row mb-1">
-                <div class="col-md-3"><span th:text="#{bill.details.electricityCurrentLabel}">Current Reading (kWh):</span></div>
-                <div class="col-md-9 text-end" th:text="${#numbers.formatDecimal(bill.electricityKwhCurrent, 1, 'COMMA', 1, 'POINT')}"></div>
-            </div>
-            <div class="row mb-1">
-                <div class="col-md-3"><span th:text="#{bill.details.electricityUsageLabel}">Usage (kWh):</span></div>
-                <div class="col-md-9 text-end" th:text="${#numbers.formatDecimal(bill.electricityKwhCurrent - bill.electricityKwhPrevious, 1, 'COMMA', 1, 'POINT')}"></div>
-            </div>
-            <div class="row mb-1">
-                <div class="col-md-3"><span th:text="#{bill.details.electricityPricePerKwhLabel}">Price per kWh:</span></div>
-                <div class="col-md-9 text-end" th:text="${#numbers.formatDecimal(electricityPriceUnit, 1, 'COMMA', 0, 'POINT') + ' VND'}"></div>
-            </div>
-            <div class="row mb-2">
-                <div class="col-md-3"><strong th:text="#{bill.details.electricityCostLabel}">Electricity Cost:</strong></div>
-                <div class="col-md-9 text-end fw-bold" th:text="${#numbers.formatDecimal(bill.electricityCost, 1, 'COMMA', 0, 'POINT') + ' VND'}"></div>
-            </div>
-
-            <hr/>
-            <h5 th:text="#{bill.details.waterTitle}">Water</h5>
-            <div class="row mb-1">
-                <div class="col-md-3"><span th:text="#{bill.details.waterPreviousLabel}">Previous Reading (m³):</span></div>
-                <div class="col-md-9 text-end" th:text="${#numbers.formatDecimal(bill.waterM3Previous, 1, 'COMMA', 1, 'POINT')}"></div>
-            </div>
-            <div class="row mb-1">
-                <div class="col-md-3"><span th:text="#{bill.details.waterCurrentLabel}">Current Reading (m³):</span></div>
-                <div class="col-md-9 text-end" th:text="${#numbers.formatDecimal(bill.waterM3Current, 1, 'COMMA', 1, 'POINT')}"></div>
-            </div>
-             <div class="row mb-1">
-                <div class="col-md-3"><span th:text="#{bill.details.waterUsageLabel}">Usage (m³):</span></div>
-                <div class="col-md-9 text-end" th:text="${#numbers.formatDecimal(bill.waterM3Current - bill.waterM3Previous, 1, 'COMMA', 1, 'POINT')}"></div>
-            </div>
-            <div class="row mb-1">
-                <div class="col-md-3"><span th:text="#{bill.details.waterPricePerM3Label}">Price per m³:</span></div>
-                <div class="col-md-9 text-end" th:text="${#numbers.formatDecimal(waterPriceUnit, 1, 'COMMA', 0, 'POINT') + ' VND'}"></div>
-            </div>
-            <div class="row mb-2">
-                <div class="col-md-3"><strong th:text="#{bill.details.waterCostLabel}">Water Cost:</strong></div>
-                <div class="col-md-9 text-end fw-bold" th:text="${#numbers.formatDecimal(bill.waterCost, 1, 'COMMA', 0, 'POINT') + ' VND'}"></div>
-            </div>
-
-            <hr/>
-            <h5 th:text="#{bill.details.otherFeesTitle}">Other Fees</h5>
-            <div class="row mb-1">
-                <div class="col-md-3"><span th:text="#{bill.details.trashFeeLabel}">Trash Fee:</span></div>
-                <div class="col-md-9 text-end" th:text="${#numbers.formatDecimal(bill.trashFee, 1, 'COMMA', 0, 'POINT') + ' VND'}"></div>
-            </div>
-            <div class="row mb-2">
-                <div class="col-md-3"><span th:text="#{bill.details.wifiFeeLabel}">WiFi Fee:</span></div>
-                <div class="col-md-9 text-end" th:text="${#numbers.formatDecimal(bill.wifiFee, 1, 'COMMA', 0, 'POINT') + ' VND'}"></div>
-            </div>
-
-            <hr/>
-            <div class="row mt-3 mb-3">
-                <div class="col-md-3"><h4 th:text="#{bill.details.totalAmountDueLabel}">Total Amount Due:</h4></div>
-                <div class="col-md-9 text-end h4 fw-bold" th:text="${#numbers.formatDecimal(bill.totalAmount, 1, 'COMMA', 0, 'POINT') + ' VND'}"></div>
+            <div class="title">
+                <h3>HÓA ĐƠN TIỀN TRỌ</h3>
+                <p>Số phòng: <span th:text="${bill.tenant?.name}">[Xem tên người thuê]</span> <!-- Placeholder: Room info needs to be added to Tenant entity --> </p>
             </div>
         </div>
-        <div class="card-footer text-muted">
-            <span th:text="#{bill.details.generatedOnLabel}">Generated on</span> <span th:text="${#dates.format(#dates.createNow(), 'dd-MMM-yyyy HH:mm')}"></span>
+
+        <table class="bill-table">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>DANH MỤC</th>
+                    <th>SỐ CŨ</th>
+                    <th>SỐ MỚI</th>
+                    <th>TIÊU THỤ</th>
+                    <th class="amount-header">THÀNH TIỀN (VND)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Tiền phòng</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="amount" th:text="${#numbers.formatDecimal(bill.roomRent, 0, 'COMMA', 0, 'POINT')}"></td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Điện</td>
+                    <td th:text="${#numbers.formatDecimal(bill.electricityKwhPrevious, 1, 'COMMA', 1, 'POINT')}"></td>
+                    <td th:text="${#numbers.formatDecimal(bill.electricityKwhCurrent, 1, 'COMMA', 1, 'POINT')}"></td>
+                    <td th:text="${#numbers.formatDecimal(bill.electricityKwhCurrent - bill.electricityKwhPrevious, 1, 'COMMA', 1, 'POINT')}"></td>
+                    <td class="amount" th:text="${#numbers.formatDecimal(bill.electricityCost, 0, 'COMMA', 0, 'POINT')}"></td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Nước</td>
+                    <td th:text="${#numbers.formatDecimal(bill.waterM3Previous, 1, 'COMMA', 1, 'POINT')}"></td>
+                    <td th:text="${#numbers.formatDecimal(bill.waterM3Current, 1, 'COMMA', 1, 'POINT')}"></td>
+                    <td th:text="${#numbers.formatDecimal(bill.waterM3Current - bill.waterM3Previous, 1, 'COMMA', 1, 'POINT')}"></td>
+                    <td class="amount" th:text="${#numbers.formatDecimal(bill.waterCost, 0, 'COMMA', 0, 'POINT')}"></td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Mạng</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="amount" th:text="${#numbers.formatDecimal(bill.wifiFee, 0, 'COMMA', 0, 'POINT')}"></td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Rác</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="amount" th:text="${#numbers.formatDecimal(bill.trashFee, 0, 'COMMA', 0, 'POINT')}"></td>
+                </tr>
+                <!-- Add more empty rows if needed to match the 10 rows in the image -->
+                <tr th:each="i : ${#numbers.sequence(6, 10)}">
+                    <td th:text="${i}"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5" style="text-align: right; font-weight: bold;">CỘNG</td>
+                    <td class="amount" style="font-weight: bold;" th:text="${#numbers.formatDecimal(bill.totalAmount, 0, 'COMMA', 0, 'POINT')}"></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="bill-footer">
+            Tháng <span th:text="${bill.billMonth}"></span> Năm <span th:text="${bill.billYear}"></span>
         </div>
     </div>
 
-    <div class="mt-3">
+    <div class="action-buttons">
         <a th:href="@{/bills/edit/{id}(id=${bill.id})}" class="btn btn-warning me-2" th:text="#{button.edit}">Edit</a>
-        <a th:href="@{/bills/delete/{id}(id=${bill.id})}" class="btn btn-danger me-2" th:text="#{button.delete}" th:onclick="return confirm(#messages.msg('confirm.delete.bill.text', bill.id));">Delete</a>
-            <a th:href="@{/bills/tenant/{tenantId}(tenantId=${bill.tenant.id})}" class="btn btn-secondary" th:text="#{bill.details.backToTenantBillsButton}">Back to Tenant's Bills</a>
-            <a th:href="@{/bills}" class="btn btn-info" th:text="#{bill.details.backToAllBillsButton}">Back to All Bills</a>
-            <a th:href="@{/bills/export/pdf/{billId}(billId=${bill.id})}" class="btn btn-success" th:text="#{button.export.pdf}">Export to PDF</a>
+        <form th:action="@{/bills/delete/{id}(id=${bill.id})}" method="post" style="display: inline-block;" th:onsubmit="'return confirm(\'' + #messages.msg('confirm.delete.bill.text', ${bill.id}) + '\');'">
+            <button type="submit" class="btn btn-danger me-2" th:text="#{button.delete}">Delete</button>
+        </form>
+        <a th:href="@{/bills/export/pdf/{billId}(billId=${bill.id})}" class="btn btn-success me-2" th:text="#{button.export.pdf}">Export to PDF</a>
+        <a th:href="@{/bills/tenant/{tenantId}(tenantId=${bill.tenant.id})}" class="btn btn-secondary me-2" th:text="#{bill.details.backToTenantBillsButton}">Back to Tenant's Bills</a>
+        <a th:href="@{/bills}" class="btn btn-info" th:text="#{bill.details.backToAllBillsButton}">Back to All Bills</a>
     </div>
 
 </th:block>
