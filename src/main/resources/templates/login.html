@@ -1,52 +1,214 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="#{login.title}">Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/cosmo/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            background-color: #f8f9fa;
-            margin: 0;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #667eea 100%);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            padding: 1rem;
         }
+
         .login-container {
-            max-width: 400px;
+            max-width: 420px;
             width: 100%;
-            padding: 2rem;
-            background-color: #fff;
-            border-radius: 0.5rem;
-            box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
+            padding: 2.5rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .logo-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .login-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 0.875rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        }
+
+        .input-group-text {
+            border: 2px solid #e0e0e0;
+            border-right: none;
+            border-radius: 12px 0 0 12px;
+            background: #f8f9fa;
+            color: #667eea;
+        }
+
+        .input-group .form-control {
+            border-left: none;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 0.875rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            width: 100%;
+            color: white;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #5a71d4 0%, #6a4490 100%);
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, rgba(245, 87, 108, 0.15) 0%, rgba(240, 147, 251, 0.15) 100%);
+            color: #a12c3c;
+            border-left: 4px solid #f5576c;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, rgba(17, 153, 142, 0.15) 0%, rgba(56, 239, 125, 0.15) 100%);
+            color: #0d7366;
+            border-left: 4px solid #11998e;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 2rem;
+            color: #95a5a6;
+            font-size: 0.875rem;
         }
     </style>
 </head>
+
 <body>
-<div class="login-container">
-    <h2 class="text-center mb-4" th:text="#{login.title}">Login</h2>
-
-    <div th:if="${param.error}" class="alert alert-danger" role="alert">
-        <span th:text="#{login.error}">Invalid username or password.</span>
-    </div>
-    <div th:if="${param.logout}" class="alert alert-success" role="alert">
-        <span th:text="#{login.logout.success}">You have been logged out successfully.</span>
-    </div>
-
-    <form th:action="@{/login}" method="post">
-        <div class="mb-3">
-            <label for="username" class="form-label" th:text="#{login.username.label}">Username</label>
-            <input type="text" class="form-control" id="username" name="username" required autofocus>
+    <div class="login-container">
+        <div class="logo-container">
+            <div class="logo-icon">
+                <i class="bi bi-house-heart-fill"></i>
+            </div>
+            <h1 class="login-title">NhaTro Management</h1>
+            <p class="login-subtitle" th:text="#{login.title}">Đăng nhập để tiếp tục</p>
         </div>
-        <div class="mb-3">
-            <label for="password" class="form-label" th:text="#{login.password.label}">Password</label>
-            <input type="password" class="form-control" id="password" name="password" required>
-        </div>
-        <button type="submit" class="btn btn-primary w-100" th:text="#{login.button}">Login</button>
-    </form>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <div th:if="${param.error}" class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-circle me-2"></i>
+            <span th:text="#{login.error}">Tên đăng nhập hoặc mật khẩu không đúng.</span>
+        </div>
+        <div th:if="${param.logout}" class="alert alert-success" role="alert">
+            <i class="bi bi-check-circle me-2"></i>
+            <span th:text="#{login.logout.success}">Đã đăng xuất thành công.</span>
+        </div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="mb-3">
+                <label for="username" class="form-label" th:text="#{login.username.label}">Tên đăng nhập</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                    <input type="text" class="form-control" id="username" name="username"
+                        placeholder="Nhập tên đăng nhập" required autofocus>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label" th:text="#{login.password.label}">Mật khẩu</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                    <input type="password" class="form-control" id="password" name="password"
+                        placeholder="Nhập mật khẩu" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-login">
+                <i class="bi bi-box-arrow-in-right me-2"></i>
+                <span th:text="#{login.button}">Đăng Nhập</span>
+            </button>
+        </form>
+
+        <p class="footer-text">
+            <i class="bi bi-shield-check me-1"></i>
+            Bảo mật bởi Spring Security
+        </p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

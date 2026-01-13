@@ -1,35 +1,125 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/_layout :: html(pageTitle=#{bill.list.all.title}, content=~{::content})}" lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{fragments/_layout :: html(pageTitle=#{bill.list.all.title}, content=~{::content})}" lang="en">
 
 <th:block th:fragment="content">
-    <h2 th:text="#{bill.list.all.title}">All Bills</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="bi bi-receipt me-2"></i>
+            <span th:text="#{bill.list.all.title}">All Bills</span>
+        </h2>
+        <a th:href="@{/quick-entry}" class="btn btn-warning">
+            <i class="bi bi-lightning-charge me-1"></i>
+            <span th:text="#{nav.quickEntry}">Nhập Nhanh</span>
+        </a>
+    </div>
 
-    <div th:if="${#lists.isEmpty(bills)}" class="alert alert-info">
+    <!-- Filter Form -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-funnel me-2"></i>
+                <span th:text="#{statistics.filter.title}">Bộ lọc</span>
+            </h5>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/bills}" method="get">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label" th:text="#{statistics.filter.room}">Phòng</label>
+                        <select name="tenantId" class="form-select">
+                            <option value="" th:text="#{statistics.filter.allRooms}">-- Tất cả --</option>
+                            <option th:each="tenant : ${tenants}" th:value="${tenant.id}" th:text="${tenant.name}"
+                                th:selected="${tenant.id == selectedTenantId}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label" th:text="#{statistics.filter.month}">Tháng</label>
+                        <select name="month" class="form-select">
+                            <option value="" th:text="#{statistics.filter.allMonths}">-- Tất cả --</option>
+                            <option th:each="m : ${#numbers.sequence(1, 12)}" th:value="${m}" th:text="${m}"
+                                th:selected="${m == selectedMonth}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label" th:text="#{statistics.filter.year}">Năm</label>
+                        <select name="year" class="form-select">
+                            <option value="" th:text="#{statistics.filter.allYears}">-- Tất cả --</option>
+                            <option th:each="y : ${years}" th:value="${y}" th:text="${y}"
+                                th:selected="${y == selectedYear}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="bi bi-search me-1"></i>
+                            <span th:text="#{button.filter}">Lọc</span>
+                        </button>
+                        <a th:href="@{/bills}" class="btn btn-outline-secondary" th:text="#{button.reset}">Reset</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results count -->
+    <div class="alert alert-info mb-3" th:unless="${#lists.isEmpty(bills)}">
+        <i class="bi bi-info-circle me-1"></i>
+        <strong th:text="${#lists.size(bills)}"></strong>
+        <span th:text="#{bill.list.count}">hóa đơn được tìm thấy</span>
+    </div>
+
+    <div th:if="${#lists.isEmpty(bills)}" class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-1"></i>
         <span th:text="#{bill.list.empty.system}">No bills found in the system.</span>
     </div>
 
-    <table class="table table-striped table-hover" th:unless="${#lists.isEmpty(bills)}">
-        <thead>
-        <tr>
-            <th th:text="#{general.id}">ID</th>
-            <th th:text="#{bill.tenant}">Tenant</th>
-            <th th:text="#{bill.monthYear}">Month/Year</th>
-            <th th:text="#{bill.totalAmount}">Total Amount</th>
-            <th th:text="#{general.actions}">Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="bill : ${bills}">
-            <td th:text="${bill.id}"></td>
-            <td th:text="${bill.tenant.name}"></td>
-            <td th:text="${bill.billMonth + '/' + bill.billYear}"></td>
-            <td th:text="${#numbers.formatDecimal(bill.totalAmount, 1, #messages.msg('format.decimal.groupingSeparator'), 0, #messages.msg('format.decimal.decimalSeparator')) + ' ' + #messages.msg('currency.vnd')}"></td>
-            <td>
-                <a th:href="@{/bills/{id}(id=${bill.id})}" class="btn btn-sm btn-outline-info" th:text="#{button.view.details}">View Details</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="table-responsive" th:unless="${#lists.isEmpty(bills)}">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th th:text="#{general.id}">ID</th>
+                    <th th:text="#{bill.tenant}">Tenant</th>
+                    <th th:text="#{bill.monthYear}">Month/Year</th>
+                    <th th:text="#{bill.totalAmount}">Total Amount</th>
+                    <th th:text="#{bill.status}">Status</th>
+                    <th th:text="#{general.actions}">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="bill : ${bills}">
+                    <td th:text="${bill.id}"></td>
+                    <td>
+                        <i class="bi bi-house-door text-primary me-1"></i>
+                        <span th:text="${bill.tenant.name}"></span>
+                    </td>
+                    <td>
+                        <span class="badge bg-secondary" th:text="${bill.billMonth + '/' + bill.billYear}"></span>
+                    </td>
+                    <td class="fw-bold text-success"
+                        th:text="${#numbers.formatDecimal(bill.totalAmount, 1, #messages.msg('format.decimal.groupingSeparator'), 0, #messages.msg('format.decimal.decimalSeparator')) + ' ' + #messages.msg('currency.vnd')}">
+                    </td>
+                    <td>
+                        <span th:if="${bill.paid}" class="badge bg-success">
+                            <i class="bi bi-check-circle me-1"></i>Đã thanh toán
+                        </span>
+                        <span th:unless="${bill.paid}" class="badge bg-warning text-dark">
+                            <i class="bi bi-clock me-1"></i>Chưa thanh toán
+                        </span>
+                    </td>
+                    <td>
+                        <a th:href="@{/bills/{id}(id=${bill.id})}" class="btn btn-sm btn-outline-info"
+                            th:title="#{button.view.details}">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a th:href="@{/bills/edit/{id}(id=${bill.id})}" class="btn btn-sm btn-outline-warning"
+                            th:title="#{button.edit}">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </th:block>
 
 </html>

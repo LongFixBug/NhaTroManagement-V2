@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{fragments/_layout :: html(pageTitle=#{quickEntry.title}, content=~{::content})}" lang="en">
+
+<th:block th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="bi bi-lightning-charge me-2"></i>
+            <span th:text="#{quickEntry.title}">Nhập Nhanh Chỉ Số</span>
+        </h2>
+        <a th:href="@{/bills}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>
+            <span th:text="#{button.cancel}">Hủy</span>
+        </a>
+    </div>
+
+    <form th:action="@{/quick-entry/save}" th:object="${bulkDTO}" method="post">
+        <!-- Month/Year Selection -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar3 me-2"></i>
+                    <span th:text="#{quickEntry.billingPeriod}">Kỳ Thanh Toán</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label" th:text="#{statistics.filter.month}">Tháng</label>
+                        <select th:field="*{billMonth}" class="form-select">
+                            <option th:each="m : ${#numbers.sequence(1, 12)}" th:value="${m}" th:text="${m}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" th:text="#{statistics.filter.year}">Năm</label>
+                        <input type="number" th:field="*{billYear}" class="form-control" min="2020" max="2100" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meter Readings Table -->
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-speedometer2 me-2"></i>
+                    <span th:text="#{quickEntry.meterReadings}">Chỉ Số Điện Nước</span>
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th style="width: 40px;">
+                                    <input type="checkbox" id="selectAll" checked class="form-check-input" />
+                                </th>
+                                <th th:text="#{quickEntry.room}">Phòng</th>
+                                <th class="text-center" th:text="#{quickEntry.electricityPrev}">Điện Cũ</th>
+                                <th class="text-center bg-warning text-dark" th:text="#{quickEntry.electricityCurrent}">
+                                    Điện Mới</th>
+                                <th class="text-center" th:text="#{quickEntry.waterPrev}">Nước Cũ</th>
+                                <th class="text-center bg-info text-dark" th:text="#{quickEntry.waterCurrent}">Nước Mới
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="reading, stat : *{readings}">
+                                <td>
+                                    <input type="checkbox" th:field="*{readings[__${stat.index}__].selected}"
+                                        class="form-check-input room-checkbox" />
+                                </td>
+                                <td>
+                                    <input type="hidden" th:field="*{readings[__${stat.index}__].tenantId}" />
+                                    <input type="hidden" th:field="*{readings[__${stat.index}__].tenantName}" />
+                                    <input type="hidden"
+                                        th:field="*{readings[__${stat.index}__].electricityPrevious}" />
+                                    <input type="hidden" th:field="*{readings[__${stat.index}__].waterPrevious}" />
+                                    <input type="hidden" th:field="*{readings[__${stat.index}__].roomRent}" />
+                                    <input type="hidden" th:field="*{readings[__${stat.index}__].trashFee}" />
+                                    <input type="hidden" th:field="*{readings[__${stat.index}__].wifiFee}" />
+                                    <input type="hidden" th:field="*{readings[__${stat.index}__].occupantName}" />
+                                    <strong>
+                                        <i class="bi bi-house-door text-primary me-1"></i>
+                                        <span th:text="${reading.tenantName}"></span>
+                                    </strong>
+                                </td>
+                                <td class="text-center text-muted">
+                                    <span th:text="${#numbers.formatDecimal(reading.electricityPrevious, 1, 1)}"></span>
+                                </td>
+                                <td class="bg-warning-subtle">
+                                    <input type="number" th:field="*{readings[__${stat.index}__].electricityCurrent}"
+                                        class="form-control form-control-sm text-center" step="0.1"
+                                        th:placeholder="${reading.electricityPrevious}" />
+                                </td>
+                                <td class="text-center text-muted">
+                                    <span th:text="${#numbers.formatDecimal(reading.waterPrevious, 1, 1)}"></span>
+                                </td>
+                                <td class="bg-info-subtle">
+                                    <input type="number" th:field="*{readings[__${stat.index}__].waterCurrent}"
+                                        class="form-control form-control-sm text-center" step="0.1"
+                                        th:placeholder="${reading.waterPrevious}" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-success btn-lg">
+                <i class="bi bi-check-circle me-2"></i>
+                <span th:text="#{quickEntry.createBills}">Tạo Hóa Đơn</span>
+            </button>
+            <a th:href="@{/bills}" class="btn btn-outline-secondary btn-lg" th:text="#{button.cancel}">Hủy</a>
+        </div>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Select All checkbox functionality
+            const selectAll = document.getElementById('selectAll');
+            const roomCheckboxes = document.querySelectorAll('.room-checkbox');
+
+            selectAll.addEventListener('change', function () {
+                roomCheckboxes.forEach(cb => cb.checked = this.checked);
+            });
+
+            roomCheckboxes.forEach(cb => {
+                cb.addEventListener('change', function () {
+                    selectAll.checked = [...roomCheckboxes].every(c => c.checked);
+                });
+            });
+        });
+    </script>
+</th:block>
+
+</html>

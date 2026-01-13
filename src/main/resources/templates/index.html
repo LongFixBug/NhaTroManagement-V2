@@ -1,17 +1,346 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/_layout :: html(pageTitle=#{app.title}, content=~{::content})}" lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{fragments/_layout :: html(pageTitle=#{app.title}, content=~{::content})}" lang="en">
 
 <th:block th:fragment="content">
-    <div class="px-4 py-5 my-5 text-center">
-        <h1 class="display-5 fw-bold" th:text="#{app.title}">Welcome to the Boarding House Management Application!</h1>
-        <div class="col-lg-6 mx-auto">
-            <p class="lead mb-4" th:text="#{app.description}">Manage your boarding house tenants and their monthly bills efficiently.</p>
-            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                <a th:href="@{/tenants}" class="btn btn-primary btn-lg px-4 gap-3"><span th:text="#{nav.tenants}">Go to Tenants</span></a>
-                <a th:href="@{/bills}" class="btn btn-outline-secondary btn-lg px-4"><span th:text="#{nav.bills.all}">Go to Bills</span></a>
+    <!-- Dashboard Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="bi bi-speedometer2 me-2"></i>
+            <span th:text="#{dashboard.title}">Dashboard</span>
+        </h2>
+        <div>
+            <a th:href="@{/tenants}" class="btn btn-primary me-2">
+                <i class="bi bi-house-door me-1"></i>
+                <span th:text="#{nav.tenants}">Rooms</span>
+            </a>
+            <a th:href="@{/bills}" class="btn btn-outline-secondary">
+                <i class="bi bi-receipt me-1"></i>
+                <span th:text="#{nav.bills.all}">All Bills</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-white-50" th:text="#{dashboard.totalRooms}">Total Rooms
+                            </h6>
+                            <h2 class="card-title mb-0" th:text="${totalRooms}">0</h2>
+                        </div>
+                        <i class="bi bi-house-door fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-white-50" th:text="#{dashboard.totalBills}">Total Bills
+                            </h6>
+                            <h2 class="card-title mb-0" th:text="${totalBills}">0</h2>
+                        </div>
+                        <i class="bi bi-receipt fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-white-50" th:text="#{dashboard.totalRevenue}">Total
+                                Revenue</h6>
+                            <h5 class="card-title mb-0"
+                                th:text="${#numbers.formatDecimal(totalRevenue, 1, #messages.msg('format.decimal.groupingSeparator'), 0, #messages.msg('format.decimal.decimalSeparator'))}">
+                                0</h5>
+                            <small th:text="#{currency.vnd}">VND</small>
+                        </div>
+                        <i class="bi bi-cash-coin fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-muted" th:text="#{dashboard.unpaidBills}">Unpaid Bills
+                            </h6>
+                            <h2 class="card-title mb-0" th:text="${unpaidBills}">0</h2>
+                        </div>
+                        <i class="bi bi-exclamation-triangle fs-1 opacity-50"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Charts Row -->
+    <div class="row g-4 mb-4">
+        <!-- Monthly Revenue Chart -->
+        <div class="col-lg-8">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="bi bi-graph-up me-2"></i>
+                        <span th:text="#{dashboard.chart.monthlyRevenue}">Monthly Revenue (Last 6 months)</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cost Breakdown Pie Chart -->
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="bi bi-pie-chart me-2"></i>
+                        <span th:text="#{dashboard.chart.costBreakdown}">Cost Breakdown (This Month)</span>
+                    </h5>
+                </div>
+                <div class="card-body d-flex align-items-center justify-content-center">
+                    <canvas id="costPieChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stacked Bar Chart for Cost Categories -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="bi bi-bar-chart-fill me-2"></i>
+                        <span th:text="#{dashboard.chart.costCategories}">Cost Categories by Month</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="stackedBarChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Bills Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history me-2"></i>
+                        <span th:text="#{dashboard.recentBills}">Recent Bills</span>
+                    </h5>
+                    <a th:href="@{/bills}" class="btn btn-sm btn-outline-primary" th:text="#{dashboard.viewAll}">View
+                        All</a>
+                </div>
+                <div class="card-body p-0">
+                    <div th:if="${#lists.isEmpty(recentBills)}" class="text-center p-4 text-muted">
+                        <i class="bi bi-inbox fs-1"></i>
+                        <p class="mt-2" th:text="#{dashboard.noBills}">No bills yet.</p>
+                    </div>
+                    <table class="table table-hover mb-0" th:unless="${#lists.isEmpty(recentBills)}">
+                        <thead class="table-light">
+                            <tr>
+                                <th th:text="#{bill.tenant}">Room</th>
+                                <th th:text="#{bill.monthYear}">Month/Year</th>
+                                <th th:text="#{bill.totalAmount}">Total</th>
+                                <th th:text="#{label.paid}">Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="bill : ${recentBills}">
+                                <td>
+                                    <i class="bi bi-house-door text-primary me-1"></i>
+                                    <span th:text="${bill.tenant.name}"></span>
+                                </td>
+                                <td th:text="${bill.billMonth + '/' + bill.billYear}"></td>
+                                <td class="fw-bold"
+                                    th:text="${#numbers.formatDecimal(bill.totalAmount, 1, #messages.msg('format.decimal.groupingSeparator'), 0, #messages.msg('format.decimal.decimalSeparator')) + ' ' + #messages.msg('currency.vnd')}">
+                                </td>
+                                <td>
+                                    <span th:if="${bill.paid}" class="badge bg-success">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        <span th:text="#{label.paid}">Paid</span>
+                                    </span>
+                                    <span th:unless="${bill.paid}" class="badge bg-warning text-dark">
+                                        <i class="bi bi-clock me-1"></i>
+                                        <span th:text="#{dashboard.unpaid}">Unpaid</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <a th:href="@{/bills/{id}(id=${bill.id})}" class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- Charts Initialization -->
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get data from Thymeleaf
+            const monthlyStats = /*[[${monthlyStats}]]*/[];
+            const currentMonthStats = /*[[${currentMonthStats}]]*/ {};
+
+            // Prepare labels and data for line/bar charts
+            const labels = monthlyStats.map(s => s.month + '/' + s.year);
+            const totalAmountData = monthlyStats.map(s => s.totalAmount);
+            const roomRentData = monthlyStats.map(s => s.totalRoomRent);
+            const electricityData = monthlyStats.map(s => s.totalElectricityCost);
+            const waterData = monthlyStats.map(s => s.totalWaterCost);
+
+            // Revenue Line Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: /*[[#{dashboard.chart.totalRevenue}]]*/ 'Total Revenue',
+                        data: totalAmountData,
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function (value) {
+                                    return value.toLocaleString('vi-VN') + ' ₫';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Cost Pie Chart
+            const pieCtx = document.getElementById('costPieChart').getContext('2d');
+            new Chart(pieCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        /*[[#{statistics.roomRent}]]*/ 'Room Rent',
+                        /*[[#{statistics.electricityCost}]]*/ 'Electricity',
+                        /*[[#{statistics.waterCost}]]*/ 'Water',
+                        /*[[#{statistics.trashFee}]]*/ 'Trash',
+                        /*[[#{statistics.wifiFee}]]*/ 'WiFi'
+                    ],
+                    datasets: [{
+                        data: [
+                            currentMonthStats.totalRoomRent || 0,
+                            currentMonthStats.totalElectricityCost || 0,
+                            currentMonthStats.totalWaterCost || 0,
+                            currentMonthStats.totalTrashFee || 0,
+                            currentMonthStats.totalWifiFee || 0
+                        ],
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(153, 102, 255, 0.8)',
+                            'rgba(255, 99, 132, 0.8)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Stacked Bar Chart
+            const stackedCtx = document.getElementById('stackedBarChart').getContext('2d');
+            new Chart(stackedCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: /*[[#{statistics.roomRent}]]*/ 'Room Rent',
+                            data: roomRentData,
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)'
+                        },
+                        {
+                            label: /*[[#{statistics.electricityCost}]]*/ 'Electricity',
+                            data: electricityData,
+                            backgroundColor: 'rgba(255, 206, 86, 0.8)'
+                        },
+                        {
+                            label: /*[[#{statistics.waterCost}]]*/ 'Water',
+                            data: waterData,
+                            backgroundColor: 'rgba(75, 192, 192, 0.8)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function (value) {
+                                    return value.toLocaleString('vi-VN') + ' ₫';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </th:block>
 
 </html>

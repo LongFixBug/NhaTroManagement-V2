@@ -22,7 +22,8 @@ public class BillServiceImpl implements BillService {
     private final SettingService settingService;
 
     @Autowired
-    public BillServiceImpl(BillRepository billRepository, TenantRepository tenantRepository, SettingService settingService) {
+    public BillServiceImpl(BillRepository billRepository, TenantRepository tenantRepository,
+            SettingService settingService) {
         this.billRepository = billRepository;
         this.tenantRepository = tenantRepository;
         this.settingService = settingService;
@@ -30,14 +31,16 @@ public class BillServiceImpl implements BillService {
 
     @Override
     @Transactional
-    public Bill createBill(Long tenantId, int year, int month, double electricityKwhCurrent, double waterM3Current, double trashFee, double wifiFee, double roomRent, String occupantName) {
+    public Bill createBill(Long tenantId, int year, int month, double electricityKwhCurrent, double waterM3Current,
+            double trashFee, double wifiFee, double roomRent, String occupantName) {
         Tenant tenant = tenantRepository.findById(tenantId)
                 .orElseThrow(() -> new IllegalArgumentException("Tenant not found with id: " + tenantId));
 
         // Check if a bill for this tenant, month, and year already exists
         Optional<Bill> existingBill = billRepository.findByTenantAndBillMonthAndBillYear(tenant, month, year);
         if (existingBill.isPresent()) {
-            throw new IllegalStateException("A bill already exists for tenant " + tenantId + " for " + month + "/" + year);
+            throw new IllegalStateException(
+                    "A bill already exists for tenant " + tenantId + " for " + month + "/" + year);
         }
 
         Bill newBill = new Bill();
@@ -59,8 +62,11 @@ public class BillServiceImpl implements BillService {
         newBill.setOccupantName(occupantName);
 
         // Fetch dynamic prices
-        double electricityPrice = settingService.getDoubleSettingValue("ELECTRICITY_PRICE").orElse(0.0); // Default to 0.0 if not set
-        double waterPrice = settingService.getDoubleSettingValue("WATER_PRICE").orElse(0.0); // Default to 0.0 if not set
+        double electricityPrice = settingService.getDoubleSettingValue("ELECTRICITY_PRICE").orElse(0.0); // Default to
+                                                                                                         // 0.0 if not
+                                                                                                         // set
+        double waterPrice = settingService.getDoubleSettingValue("WATER_PRICE").orElse(0.0); // Default to 0.0 if not
+                                                                                             // set
 
         newBill.calculateCosts(electricityPrice, waterPrice);
         return billRepository.save(newBill);
@@ -69,7 +75,8 @@ public class BillServiceImpl implements BillService {
     private Optional<Bill> getLatestBillForTenantBefore(Tenant tenant, int year, int month) {
         YearMonth currentBillingPeriod = YearMonth.of(year, month);
         YearMonth previousBillingPeriod = currentBillingPeriod.minusMonths(1);
-        return billRepository.findByTenantAndBillMonthAndBillYear(tenant, previousBillingPeriod.getMonthValue(), previousBillingPeriod.getYear());
+        return billRepository.findByTenantAndBillMonthAndBillYear(tenant, previousBillingPeriod.getMonthValue(),
+                previousBillingPeriod.getYear());
     }
 
     @Override
@@ -89,8 +96,10 @@ public class BillServiceImpl implements BillService {
     public List<Bill> getBillsByTenant(Long tenantId) {
         Tenant tenant = tenantRepository.findById(tenantId)
                 .orElseThrow(() -> new IllegalArgumentException("Tenant not found with id: " + tenantId));
-        // This might be inefficient if a tenant has many bills. Consider pagination or specific queries.
-        // For now, let's assume it's fine. A dedicated repository method might be better.
+        // This might be inefficient if a tenant has many bills. Consider pagination or
+        // specific queries.
+        // For now, let's assume it's fine. A dedicated repository method might be
+        // better.
         return tenant.getBills(); // Assuming Tenant entity has a getBills() method from a @OneToMany mapping
                                   // If not, we need to query BillRepository by tenant
     }
@@ -124,16 +133,22 @@ public class BillServiceImpl implements BillService {
         existingBill.setOccupantName(billFromForm.getOccupantName());
         existingBill.setPaid(billFromForm.getPaid());
 
-        // electricityKwhPrevious and waterM3Previous are typically not changed during an edit
-        // as they are historical values from the point of creation or the actual previous bill.
+        // electricityKwhPrevious and waterM3Previous are typically not changed during
+        // an edit
+        // as they are historical values from the point of creation or the actual
+        // previous bill.
 
         // The tenant association should also not change during a bill edit.
 
         // Fetch dynamic prices
-        double electricityPrice = settingService.getDoubleSettingValue("ELECTRICITY_PRICE").orElse(0.0); // Default to 0.0 if not set
-        double waterPrice = settingService.getDoubleSettingValue("WATER_PRICE").orElse(0.0); // Default to 0.0 if not set
+        double electricityPrice = settingService.getDoubleSettingValue("ELECTRICITY_PRICE").orElse(0.0); // Default to
+                                                                                                         // 0.0 if not
+                                                                                                         // set
+        double waterPrice = settingService.getDoubleSettingValue("WATER_PRICE").orElse(0.0); // Default to 0.0 if not
+                                                                                             // set
 
-        existingBill.calculateCosts(electricityPrice, waterPrice); // Recalculate based on potentially new current readings and fees
+        existingBill.calculateCosts(electricityPrice, waterPrice); // Recalculate based on potentially new current
+                                                                   // readings and fees
         return billRepository.save(existingBill);
     }
 
@@ -152,5 +167,142 @@ public class BillServiceImpl implements BillService {
         Tenant tenant = tenantRepository.findById(tenantId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid tenant ID: " + tenantId));
         return billRepository.findTopByTenantOrderByBillYearDescBillMonthDescIdDesc(tenant);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public com.example.nhatromanagement.dto.BillStatisticsDTO getStatistics(Integer month, Integer year) {
+        List<Bill> bills;
+
+        if (month != null && year != null) {
+            // Filter by specific month and year
+            bills = billRepository.findByBillMonthAndBillYear(month, year);
+        } else if (year != null) {
+            // Filter by year only (all months)
+            bills = billRepository.findByBillYear(year);
+        } else {
+            // No filter - get all bills
+            bills = billRepository.findAll();
+        }
+
+        com.example.nhatromanagement.dto.BillStatisticsDTO stats = new com.example.nhatromanagement.dto.BillStatisticsDTO();
+        stats.setMonth(month);
+        stats.setYear(year);
+        stats.setBillCount(bills.size());
+
+        double totalRoomRent = 0;
+        double totalElectricityCost = 0;
+        double totalWaterCost = 0;
+        double totalTrashFee = 0;
+        double totalWifiFee = 0;
+        double totalAmount = 0;
+
+        for (Bill bill : bills) {
+            totalRoomRent += bill.getRoomRent();
+            totalElectricityCost += bill.getElectricityCost();
+            totalWaterCost += bill.getWaterCost();
+            totalTrashFee += bill.getTrashFee();
+            totalWifiFee += bill.getWifiFee();
+            totalAmount += bill.getTotalAmount();
+        }
+
+        stats.setTotalRoomRent(totalRoomRent);
+        stats.setTotalElectricityCost(totalElectricityCost);
+        stats.setTotalWaterCost(totalWaterCost);
+        stats.setTotalTrashFee(totalTrashFee);
+        stats.setTotalWifiFee(totalWifiFee);
+        stats.setTotalAmount(totalAmount);
+
+        return stats;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public com.example.nhatromanagement.dto.BillStatisticsDTO getStatistics(Integer month, Integer year,
+            Long tenantId) {
+        List<Bill> bills;
+
+        if (tenantId != null) {
+            // Filter by tenant
+            Tenant tenant = tenantRepository.findById(tenantId)
+                    .orElseThrow(() -> new IllegalArgumentException("Tenant not found with id: " + tenantId));
+
+            if (month != null && year != null) {
+                bills = billRepository.findByTenantAndBillMonthAndBillYearOrderByBillMonthDesc(tenant, month, year);
+            } else if (year != null) {
+                bills = billRepository.findByTenantAndBillYear(tenant, year);
+            } else {
+                bills = billRepository.findByTenant(tenant);
+            }
+        } else {
+            // No tenant filter - use existing logic
+            if (month != null && year != null) {
+                bills = billRepository.findByBillMonthAndBillYear(month, year);
+            } else if (year != null) {
+                bills = billRepository.findByBillYear(year);
+            } else {
+                bills = billRepository.findAll();
+            }
+        }
+
+        com.example.nhatromanagement.dto.BillStatisticsDTO stats = new com.example.nhatromanagement.dto.BillStatisticsDTO();
+        stats.setMonth(month);
+        stats.setYear(year);
+        stats.setBillCount(bills.size());
+
+        double totalRoomRent = 0;
+        double totalElectricityCost = 0;
+        double totalWaterCost = 0;
+        double totalTrashFee = 0;
+        double totalWifiFee = 0;
+        double totalAmount = 0;
+
+        for (Bill bill : bills) {
+            totalRoomRent += bill.getRoomRent();
+            totalElectricityCost += bill.getElectricityCost();
+            totalWaterCost += bill.getWaterCost();
+            totalTrashFee += bill.getTrashFee();
+            totalWifiFee += bill.getWifiFee();
+            totalAmount += bill.getTotalAmount();
+        }
+
+        stats.setTotalRoomRent(totalRoomRent);
+        stats.setTotalElectricityCost(totalElectricityCost);
+        stats.setTotalWaterCost(totalWaterCost);
+        stats.setTotalTrashFee(totalTrashFee);
+        stats.setTotalWifiFee(totalWifiFee);
+        stats.setTotalAmount(totalAmount);
+
+        return stats;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.List<Bill> getBillsByMonthAndYear(int month, int year) {
+        return billRepository.findByBillMonthAndBillYear(month, year);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.List<Bill> getBillsByYear(int year) {
+        return billRepository.findByBillYear(year);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.List<Bill> getBillsByTenant(Tenant tenant) {
+        return billRepository.findByTenant(tenant);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.List<Bill> getBillsByTenantAndYear(Tenant tenant, int year) {
+        return billRepository.findByTenantAndBillYear(tenant, year);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.List<Bill> getBillsByTenantAndMonthYear(Tenant tenant, int month, int year) {
+        return billRepository.findByTenantAndBillMonthAndBillYearOrderByBillMonthDesc(tenant, month, year);
     }
 }
