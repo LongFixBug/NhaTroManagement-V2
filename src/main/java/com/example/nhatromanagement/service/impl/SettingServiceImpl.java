@@ -16,8 +16,13 @@ public class SettingServiceImpl implements SettingService {
 
     public static final String ELECTRICITY_PRICE_KEY = "ELECTRICITY_PRICE";
     public static final String WATER_PRICE_KEY = "WATER_PRICE";
+    public static final String TRASH_FEE_KEY = "TRASH_FEE";
+    public static final String WIFI_FEE_KEY = "WIFI_FEE";
+
     public static final String DEFAULT_ELECTRICITY_PRICE = "3000"; // VND per kWh
     public static final String DEFAULT_WATER_PRICE = "13000"; // VND per m3
+    public static final String DEFAULT_TRASH_FEE = "20000"; // VND
+    public static final String DEFAULT_WIFI_FEE = "50000"; // VND
 
     private final SettingRepository settingRepository;
 
@@ -30,10 +35,18 @@ public class SettingServiceImpl implements SettingService {
     @Transactional
     public void initializeDefaultSettings() {
         if (settingRepository.findBySettingKey(ELECTRICITY_PRICE_KEY).isEmpty()) {
-            settingRepository.save(new Setting(ELECTRICITY_PRICE_KEY, DEFAULT_ELECTRICITY_PRICE, "Price per kWh of electricity in VND"));
+            settingRepository.save(new Setting(ELECTRICITY_PRICE_KEY, DEFAULT_ELECTRICITY_PRICE,
+                    "Price per kWh of electricity in VND"));
         }
         if (settingRepository.findBySettingKey(WATER_PRICE_KEY).isEmpty()) {
-            settingRepository.save(new Setting(WATER_PRICE_KEY, DEFAULT_WATER_PRICE, "Price per cubic meter (m3) of water in VND"));
+            settingRepository.save(
+                    new Setting(WATER_PRICE_KEY, DEFAULT_WATER_PRICE, "Price per cubic meter (m3) of water in VND"));
+        }
+        if (settingRepository.findBySettingKey(TRASH_FEE_KEY).isEmpty()) {
+            settingRepository.save(new Setting(TRASH_FEE_KEY, DEFAULT_TRASH_FEE, "Standard monthly trash fee in VND"));
+        }
+        if (settingRepository.findBySettingKey(WIFI_FEE_KEY).isEmpty()) {
+            settingRepository.save(new Setting(WIFI_FEE_KEY, DEFAULT_WIFI_FEE, "Standard monthly WiFi fee in VND"));
         }
     }
 

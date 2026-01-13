@@ -7,6 +7,7 @@
 /Users/nguyenhailong/Documents/Tài liệu - Mac mini của Nguyen/project/NhaTroManagement-V2/src/main/java/com/example/nhatromanagement/config/MvcConfig.java
 /Users/nguyenhailong/Documents/Tài liệu - Mac mini của Nguyen/project/NhaTroManagement-V2/src/main/java/com/example/nhatromanagement/dto/MonthlyStatDTO.java
 /Users/nguyenhailong/Documents/Tài liệu - Mac mini của Nguyen/project/NhaTroManagement-V2/src/main/java/com/example/nhatromanagement/service/impl/BillServiceImpl.java
+/Users/nguyenhailong/Documents/Tài liệu - Mac mini của Nguyen/project/NhaTroManagement-V2/src/main/java/com/example/nhatromanagement/config/RailwayDbConfig.java
 /Users/nguyenhailong/Documents/Tài liệu - Mac mini của Nguyen/project/NhaTroManagement-V2/src/main/java/com/example/nhatromanagement/controller/SettingController.java
 /Users/nguyenhailong/Documents/Tài liệu - Mac mini của Nguyen/project/NhaTroManagement-V2/src/main/java/com/example/nhatromanagement/config/SecurityConfig.java
 /Users/nguyenhailong/Documents/Tài liệu - Mac mini của Nguyen/project/NhaTroManagement-V2/src/main/java/com/example/nhatromanagement/NhaTroManagementApplication.java

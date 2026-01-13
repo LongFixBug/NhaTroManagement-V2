@@ -4,7 +4,8 @@ import com.example.nhatromanagement.model.Bill;
 import com.example.nhatromanagement.model.Tenant;
 import com.example.nhatromanagement.service.BillService;
 import com.example.nhatromanagement.service.TenantService;
-import com.example.nhatromanagement.service.SettingService; // Added SettingService import
+import com.example.nhatromanagement.service.SettingService;
+import com.example.nhatromanagement.service.impl.SettingServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -132,6 +133,12 @@ public class BillController {
         Bill bill = new Bill();
         bill.setTenant(tenant);
 
+        // Initialize default fees from global settings
+        double defaultTrashFee = settingService.getDoubleSettingValue(SettingServiceImpl.TRASH_FEE_KEY).orElse(20000.0);
+        double defaultWifiFee = settingService.getDoubleSettingValue(SettingServiceImpl.WIFI_FEE_KEY).orElse(50000.0);
+        bill.setTrashFee(defaultTrashFee);
+        bill.setWifiFee(defaultWifiFee);
+
         LocalDate today = LocalDate.now();
         bill.setBillMonth(today.getMonthValue());
         bill.setBillYear(today.getYear());
@@ -159,9 +166,12 @@ public class BillController {
         }
         // Auto-load fixed fees from previous bill
         bill.setRoomRent(lb.getRoomRent());
-        bill.setTrashFee(lb.getTrashFee());
-        // bill.setWifiFee(lb.getWifiFee()); // Requested to default to 0
-        bill.setWifiFee(0.0);
+
+        // Use global settings for generic fees
+        double defaultTrashFee = settingService.getDoubleSettingValue(SettingServiceImpl.TRASH_FEE_KEY).orElse(20000.0);
+        double defaultWifiFee = settingService.getDoubleSettingValue(SettingServiceImpl.WIFI_FEE_KEY).orElse(50000.0);
+        bill.setTrashFee(defaultTrashFee);
+        bill.setWifiFee(defaultWifiFee);
         bill.setOccupantName(prefilledOccupantName);
 
         model.addAttribute("bill", bill);
