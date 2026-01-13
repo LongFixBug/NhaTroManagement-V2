@@ -1,27 +1,22 @@
 # Build stage
-FROM eclipse-temurin:17-jdk-alpine AS build
+FROM maven:3.8.5-openjdk-17-slim AS build
 WORKDIR /app
 
-# Copy maven wrapper and pom.xml
-COPY mvnw .
-COPY .mvn .mvn
+# Copy pom.xml and source code
 COPY pom.xml .
+COPY src ./src
 
-# Download dependencies
-RUN chmod +x mvnw && ./mvnw dependency:go-offline -B
-
-# Copy source code and build
-COPY src src
-RUN ./mvnw package -DskipTests
+# Build the application
+RUN mvn clean package -DskipTests
 
 # Runtime stage
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# Copy the built jar
+# Copy the built jar from the build stage
 COPY --from=build /app/target/*.jar app.jar
 
-# Expose port
+# Expose the application port
 EXPOSE 8080
 
 # Run the application
