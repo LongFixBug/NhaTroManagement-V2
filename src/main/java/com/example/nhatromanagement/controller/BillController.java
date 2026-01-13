@@ -145,33 +145,29 @@ public class BillController {
 
         Optional<Bill> latestBill = billService.getLatestBillForTenant(tenantId);
         String prefilledOccupantName = tenant.getName(); // Default to room name
-        Bill lb = latestBill.get();
+        if (latestBill.isPresent()) {
+            Bill lb = latestBill.get();
 
-        // Auto-increment month and year relative to previous bill
-        int prevMonth = lb.getBillMonth();
-        int prevYear = lb.getBillYear();
+            // Auto-increment month and year relative to previous bill
+            int prevMonth = lb.getBillMonth();
+            int prevYear = lb.getBillYear();
 
-        if (prevMonth == 12) {
-            bill.setBillMonth(1);
-            bill.setBillYear(prevYear + 1);
-        } else {
-            bill.setBillMonth(prevMonth + 1);
-            bill.setBillYear(prevYear);
+            if (prevMonth == 12) {
+                bill.setBillMonth(1);
+                bill.setBillYear(prevYear + 1);
+            } else {
+                bill.setBillMonth(prevMonth + 1);
+                bill.setBillYear(prevYear);
+            }
+
+            bill.setElectricityKwhPrevious(lb.getElectricityKwhCurrent());
+            bill.setWaterM3Previous(lb.getWaterM3Current());
+            if (lb.getOccupantName() != null && !lb.getOccupantName().trim().isEmpty()) {
+                prefilledOccupantName = lb.getOccupantName();
+            }
+            // Auto-load fixed fees from previous bill
+            bill.setRoomRent(lb.getRoomRent());
         }
-
-        bill.setElectricityKwhPrevious(lb.getElectricityKwhCurrent());
-        bill.setWaterM3Previous(lb.getWaterM3Current());
-        if (lb.getOccupantName() != null && !lb.getOccupantName().trim().isEmpty()) {
-            prefilledOccupantName = lb.getOccupantName();
-        }
-        // Auto-load fixed fees from previous bill
-        bill.setRoomRent(lb.getRoomRent());
-
-        // Use global settings for generic fees
-        double defaultTrashFee = settingService.getDoubleSettingValue(SettingServiceImpl.TRASH_FEE_KEY).orElse(20000.0);
-        double defaultWifiFee = settingService.getDoubleSettingValue(SettingServiceImpl.WIFI_FEE_KEY).orElse(50000.0);
-        bill.setTrashFee(defaultTrashFee);
-        bill.setWifiFee(defaultWifiFee);
         bill.setOccupantName(prefilledOccupantName);
 
         model.addAttribute("bill", bill);

@@ -80,23 +80,20 @@
         <div class="row g-3">
             <div class="col-md-4 mb-3">
                 <label for="roomRent" class="form-label" th:text="#{bill.form.roomRent}">Room Rent:</label>
-                <input type="number" step="1000" name="roomRent" th:value="${bill.roomRent > 0 ? bill.roomRent : ''}"
-                    class="form-control" id="roomRent" required min="0"
-                    th:placeholder="#{bill.form.placeholder.roomRent}" />
+                <input type="number" step="1000" name="roomRent" th:value="${bill.roomRent}" class="form-control"
+                    id="roomRent" required min="0" th:placeholder="#{bill.form.placeholder.roomRent}" />
                 <div class="invalid-feedback" th:text="#{bill.form.error.roomRent}">Please provide room rent.</div>
             </div>
             <div class="col-md-4 mb-3">
                 <label for="trashFee" class="form-label" th:text="#{bill.form.trashFee}">Trash Fee:</label>
-                <input type="number" step="1000" name="trashFee" th:value="${bill.trashFee > 0 ? bill.trashFee : ''}"
-                    class="form-control" id="trashFee" required min="0"
-                    th:placeholder="#{bill.form.placeholder.trashFee}" />
+                <input type="number" step="1000" name="trashFee" th:value="${bill.trashFee}" class="form-control"
+                    id="trashFee" required min="0" th:placeholder="#{bill.form.placeholder.trashFee}" />
                 <div class="invalid-feedback" th:text="#{bill.form.error.trashFee}">Please provide trash fee.</div>
             </div>
             <div class="col-md-4 mb-3">
                 <label for="wifiFee" class="form-label" th:text="#{bill.form.wifiFee}">WiFi Fee:</label>
-                <input type="number" step="1000" name="wifiFee" th:value="${bill.wifiFee > 0 ? bill.wifiFee : ''}"
-                    class="form-control" id="wifiFee" required min="0"
-                    th:placeholder="#{bill.form.placeholder.wifiFee}" />
+                <input type="number" step="1000" name="wifiFee" th:value="${bill.wifiFee}" class="form-control"
+                    id="wifiFee" required min="0" th:placeholder="#{bill.form.placeholder.wifiFee}" />
                 <div class="invalid-feedback" th:text="#{bill.form.error.wifiFee}">Please provide WiFi fee.</div>
             </div>
         </div>
