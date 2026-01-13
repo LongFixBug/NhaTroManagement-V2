@@ -194,8 +194,8 @@
         </div>
     </div>
 
-    <!-- Chart.js Library -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Chart.js Library (Local) -->
+    <script th:src="@{/js/chart.umd.min.js}"></script>
 
     <!-- Charts Initialization -->
     <script th:inline="javascript">
@@ -203,6 +203,13 @@
             // Get data from Thymeleaf
             const monthlyStats = /*[[${monthlyStats}]]*/[];
             const currentMonthStats = /*[[${currentMonthStats}]]*/ {};
+
+            console.log("Monthly Stats:", monthlyStats);
+            console.log("Current Month Stats:", currentMonthStats);
+
+            // Null safety check
+            const safeCurrentMonthStats = currentMonthStats || {};
+
 
             // Prepare labels and data for line/bar charts
             const labels = monthlyStats.map(s => s.month + '/' + s.year);
@@ -262,11 +269,11 @@
                     ],
                     datasets: [{
                         data: [
-                            currentMonthStats.totalRoomRent || 0,
-                            currentMonthStats.totalElectricityCost || 0,
-                            currentMonthStats.totalWaterCost || 0,
-                            currentMonthStats.totalTrashFee || 0,
-                            currentMonthStats.totalWifiFee || 0
+                            safeCurrentMonthStats.totalRoomRent || 0,
+                            safeCurrentMonthStats.totalElectricityCost || 0,
+                            safeCurrentMonthStats.totalWaterCost || 0,
+                            safeCurrentMonthStats.totalTrashFee || 0,
+                            safeCurrentMonthStats.totalWifiFee || 0
                         ],
                         backgroundColor: [
                             'rgba(54, 162, 235, 0.8)',
