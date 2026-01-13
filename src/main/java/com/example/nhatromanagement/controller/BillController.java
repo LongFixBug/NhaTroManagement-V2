@@ -138,18 +138,30 @@ public class BillController {
 
         Optional<Bill> latestBill = billService.getLatestBillForTenant(tenantId);
         String prefilledOccupantName = tenant.getName(); // Default to room name
-        if (latestBill.isPresent()) {
-            Bill lb = latestBill.get();
-            bill.setElectricityKwhPrevious(lb.getElectricityKwhCurrent());
-            bill.setWaterM3Previous(lb.getWaterM3Current());
-            if (lb.getOccupantName() != null && !lb.getOccupantName().trim().isEmpty()) {
-                prefilledOccupantName = lb.getOccupantName();
-            }
-            // Auto-load fixed fees from previous bill
-            bill.setRoomRent(lb.getRoomRent());
-            bill.setTrashFee(lb.getTrashFee());
-            bill.setWifiFee(lb.getWifiFee());
+        Bill lb = latestBill.get();
+
+        // Auto-increment month and year relative to previous bill
+        int prevMonth = lb.getBillMonth();
+        int prevYear = lb.getBillYear();
+
+        if (prevMonth == 12) {
+            bill.setBillMonth(1);
+            bill.setBillYear(prevYear + 1);
+        } else {
+            bill.setBillMonth(prevMonth + 1);
+            bill.setBillYear(prevYear);
         }
+
+        bill.setElectricityKwhPrevious(lb.getElectricityKwhCurrent());
+        bill.setWaterM3Previous(lb.getWaterM3Current());
+        if (lb.getOccupantName() != null && !lb.getOccupantName().trim().isEmpty()) {
+            prefilledOccupantName = lb.getOccupantName();
+        }
+        // Auto-load fixed fees from previous bill
+        bill.setRoomRent(lb.getRoomRent());
+        bill.setTrashFee(lb.getTrashFee());
+        // bill.setWifiFee(lb.getWifiFee()); // Requested to default to 0
+        bill.setWifiFee(0.0);
         bill.setOccupantName(prefilledOccupantName);
 
         model.addAttribute("bill", bill);
