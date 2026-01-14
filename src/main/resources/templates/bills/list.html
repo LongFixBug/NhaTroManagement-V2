@@ -8,7 +8,7 @@
             <i class="bi bi-receipt me-2"></i>
             <span th:text="#{bill.list.all.title}">All Bills</span>
         </h2>
-        <a th:href="@{/quick-entry}" class="btn btn-warning">
+        <a sec:authorize="isAuthenticated()" th:href="@{/quick-entry}" class="btn btn-warning">
             <i class="bi bi-lightning-charge me-1"></i>
             <span th:text="#{nav.quickEntry}">Nhập Nhanh</span>
         </a>
@@ -111,8 +111,8 @@
                             th:title="#{button.view.details}">
                             <i class="bi bi-eye"></i>
                         </a>
-                        <a th:href="@{/bills/edit/{id}(id=${bill.id})}" class="btn btn-sm btn-outline-warning"
-                            th:title="#{button.edit}">
+                        <a sec:authorize="isAuthenticated()" th:href="@{/bills/edit/{id}(id=${bill.id})}"
+                            class="btn btn-sm btn-outline-warning" th:title="#{button.edit}">
                             <i class="bi bi-pencil"></i>
                         </a>
                     </td>

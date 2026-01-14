@@ -17,56 +17,66 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico");
-    }
+        @Bean
+        public WebSecurityCustomizer webSecurityCustomizer() {
+                return (web) -> web.ignoring().requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**",
+                                "/favicon.ico");
+        }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-    @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password(passwordEncoder.encode("password"))
-                .roles("ADMIN", "STAFF")
-                .build();
+        @Bean
+        public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
+                UserDetails admin = User.builder()
+                                .username("admin")
+                                .password(passwordEncoder.encode("password"))
+                                .roles("ADMIN", "STAFF")
+                                .build();
 
-        UserDetails staff = User.builder()
-                .username("staff")
-                .password(passwordEncoder.encode("password"))
-                .roles("STAFF")
-                .build();
+                UserDetails staff = User.builder()
+                                .username("staff")
+                                .password(passwordEncoder.encode("password"))
+                                .roles("STAFF")
+                                .build();
 
-        return new InMemoryUserDetailsManager(admin, staff);
-    }
+                return new InMemoryUserDetailsManager(admin, staff);
+        }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/login", "/").permitAll() // Permit root and login explicitly
-                        .requestMatchers("/settings/**").hasRole("ADMIN")
-                        .requestMatchers("/tenants/delete/**", "/bills/delete/**").hasRole("ADMIN") // Example restrictions
-                        .anyRequest().authenticated()
-                )
-                .formLogin(formLogin -> formLogin
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/tenants", true)
-                        .failureUrl("/login?error=true")
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout") // Good practice to specify logout URL
-                        .logoutSuccessUrl("/login?logout")
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
-                        .permitAll()
-                );
-        return http.build();
-    }
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+                http
+                                .authorizeHttpRequests(authorize -> authorize
+                                                .requestMatchers("/login", "/").permitAll()
+                                                // Public read access to bills and statistics
+                                                .requestMatchers(org.springframework.http.HttpMethod.GET, "/bills",
+                                                                "/bills/statistics", "/bills/{id}")
+                                                .permitAll()
+                                                // Protected write operations
+                                                .requestMatchers("/settings/**").hasRole("ADMIN")
+                                                .requestMatchers("/tenants/delete/**", "/bills/delete/**")
+                                                .hasRole("ADMIN")
+                                                .requestMatchers("/bills/add/**", "/bills/edit/**", "/bills/create",
+                                                                "/bills/update/**", "/quick-entry/**")
+                                                .authenticated()
+                                                .requestMatchers("/tenants/add/**", "/tenants/edit/**",
+                                                                "/tenants/create", "/tenants/update/**")
+                                                .authenticated()
+                                                .anyRequest().authenticated())
+                                .formLogin(formLogin -> formLogin
+                                                .loginPage("/login")
+                                                .loginProcessingUrl("/login")
+                                                .defaultSuccessUrl("/tenants", true)
+                                                .failureUrl("/login?error=true")
+                                                .permitAll())
+                                .logout(logout -> logout
+                                                .logoutUrl("/logout") // Good practice to specify logout URL
+                                                .logoutSuccessUrl("/login?logout")
+                                                .invalidateHttpSession(true)
+                                                .deleteCookies("JSESSIONID")
+                                                .permitAll());
+                return http.build();
+        }
 }
