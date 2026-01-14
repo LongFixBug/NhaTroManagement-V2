@@ -17,8 +17,9 @@ public class RailwayDbConfig {
     public DataSource dataSource() throws URISyntaxException {
         String databaseUrl = System.getenv("DATABASE_URL");
         if (databaseUrl == null || databaseUrl.isEmpty()) {
-            System.out.println("⚠️ DATABASE_URL is empty, falling back to properties config");
-            return null; // Fallback to application.properties
+            System.err.println("❌ DATABASE_URL environment variable is not set!");
+            throw new IllegalStateException(
+                    "DATABASE_URL environment variable is required in production profile but was not found. Please configure it in Railway.");
         }
 
         try {
