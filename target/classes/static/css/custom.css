@@ -647,6 +647,25 @@ footer {
         font-size: 14px;
         padding: 0.5rem;
     }
+
+    /* Statistics table - ensure it fits on mobile */
+    .statistics-table,
+    .card .table-responsive .table {
+        min-width: auto !important;
+        width: 100%;
+    }
+
+    .card .table th,
+    .card .table td {
+        padding: 0.5rem;
+        white-space: normal;
+        word-wrap: break-word;
+    }
+
+    .card .table .text-end {
+        text-align: right !important;
+        min-width: 120px;
+    }
 }
 
 /* Small mobile - below 480px */

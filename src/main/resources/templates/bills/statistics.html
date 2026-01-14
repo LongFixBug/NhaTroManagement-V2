@@ -72,78 +72,80 @@
                 </div>
 
                 <!-- Statistics Table -->
-                <table class="table table-bordered table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th th:text="#{statistics.table.category}">Loại</th>
-                            <th class="text-end" th:text="#{statistics.table.total}">Tổng tiền</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <i class="bi bi-house-door text-primary me-2"></i>
-                                <span th:text="#{statistics.roomRent}">Tiền phòng</span>
-                            </td>
-                            <td class="text-end fw-bold text-primary"
-                                th:text="${#numbers.formatDecimal(statistics.totalRoomRent, 1, #messages.msg('format.decimal.groupingSeparator'), 0, #messages.msg('format.decimal.decimalSeparator')) + ' ' + #messages.msg('currency.vnd')}">
-                                1,000,000 VNĐ
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <i class="bi bi-lightning-charge text-warning me-2"></i>
-                                <span th:text="#{statistics.electricityCost}">Tiền điện</span>
-                            </td>
-                            <td class="text-end fw-bold text-warning"
-                                th:text="${#numbers.formatDecimal(statistics.totalElectricityCost, 1, #messages.msg('format.decimal.groupingSeparator'), 0, #messages.msg('format.decimal.decimalSeparator')) + ' ' + #messages.msg('currency.vnd')}">
-                                500,000 VNĐ
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <i class="bi bi-droplet text-info me-2"></i>
-                                <span th:text="#{statistics.waterCost}">Tiền nước</span>
-                            </td>
-                            <td class="text-end fw-bold text-info"
-                                th:text="${#numbers.formatDecimal(statistics.totalWaterCost, 1, #messages.msg('format.decimal.groupingSeparator'), 0, #messages.msg('format.decimal.decimalSeparator')) + ' ' + #messages.msg('currency.vnd')}">
-                                200,000 VNĐ
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <i class="bi bi-trash text-secondary me-2"></i>
-                                <span th:text="#{statistics.trashFee}">Phí rác</span>
-                            </td>
-                            <td class="text-end"
-                                th:text="${#numbers.formatDecimal(statistics.totalTrashFee, 1, #messages.msg('format.decimal.groupingSeparator'), 0, #messages.msg('format.decimal.decimalSeparator')) + ' ' + #messages.msg('currency.vnd')}">
-                                50,000 VNĐ
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <i class="bi bi-wifi text-success me-2"></i>
-                                <span th:text="#{statistics.wifiFee}">Phí WiFi</span>
-                            </td>
-                            <td class="text-end"
-                                th:text="${#numbers.formatDecimal(statistics.totalWifiFee, 1, #messages.msg('format.decimal.groupingSeparator'), 0, #messages.msg('format.decimal.decimalSeparator')) + ' ' + #messages.msg('currency.vnd')}">
-                                100,000 VNĐ
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot class="table-dark">
-                        <tr>
-                            <th>
-                                <i class="bi bi-calculator me-2"></i>
-                                <span th:text="#{statistics.grandTotal}">TỔNG CỘNG</span>
-                            </th>
-                            <th class="text-end fs-5"
-                                th:text="${#numbers.formatDecimal(statistics.totalAmount, 1, #messages.msg('format.decimal.groupingSeparator'), 0, #messages.msg('format.decimal.decimalSeparator')) + ' ' + #messages.msg('currency.vnd')}">
-                                1,850,000 VNĐ
-                            </th>
-                        </tr>
-                    </tfoot>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th th:text="#{statistics.table.category}">Loại</th>
+                                <th class="text-end" th:text="#{statistics.table.total}">Tổng tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <i class="bi bi-house-door text-primary me-2"></i>
+                                    <span th:text="#{statistics.roomRent}">Tiền phòng</span>
+                                </td>
+                                <td class="text-end fw-bold text-primary"
+                                    th:text="${#numbers.formatDecimal(statistics.totalRoomRent, 1, #messages.msg('format.decimal.groupingSeparator'), 0, #messages.msg('format.decimal.decimalSeparator')) + ' ' + #messages.msg('currency.vnd')}">
+                                    1,000,000 VNĐ
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i class="bi bi-lightning-charge text-warning me-2"></i>
+                                    <span th:text="#{statistics.electricityCost}">Tiền điện</span>
+                                </td>
+                                <td class="text-end fw-bold text-warning"
+                                    th:text="${#numbers.formatDecimal(statistics.totalElectricityCost, 1, #messages.msg('format.decimal.groupingSeparator'), 0, #messages.msg('format.decimal.decimalSeparator')) + ' ' + #messages.msg('currency.vnd')}">
+                                    500,000 VNĐ
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i class="bi bi-droplet text-info me-2"></i>
+                                    <span th:text="#{statistics.waterCost}">Tiền nước</span>
+                                </td>
+                                <td class="text-end fw-bold text-info"
+                                    th:text="${#numbers.formatDecimal(statistics.totalWaterCost, 1, #messages.msg('format.decimal.groupingSeparator'), 0, #messages.msg('format.decimal.decimalSeparator')) + ' ' + #messages.msg('currency.vnd')}">
+                                    200,000 VNĐ
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i class="bi bi-trash text-secondary me-2"></i>
+                                    <span th:text="#{statistics.trashFee}">Phí rác</span>
+                                </td>
+                                <td class="text-end"
+                                    th:text="${#numbers.formatDecimal(statistics.totalTrashFee, 1, #messages.msg('format.decimal.groupingSeparator'), 0, #messages.msg('format.decimal.decimalSeparator')) + ' ' + #messages.msg('currency.vnd')}">
+                                    50,000 VNĐ
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i class="bi bi-wifi text-success me-2"></i>
+                                    <span th:text="#{statistics.wifiFee}">Phí WiFi</span>
+                                </td>
+                                <td class="text-end"
+                                    th:text="${#numbers.formatDecimal(statistics.totalWifiFee, 1, #messages.msg('format.decimal.groupingSeparator'), 0, #messages.msg('format.decimal.decimalSeparator')) + ' ' + #messages.msg('currency.vnd')}">
+                                    100,000 VNĐ
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="table-dark">
+                            <tr>
+                                <th>
+                                    <i class="bi bi-calculator me-2"></i>
+                                    <span th:text="#{statistics.grandTotal}">TỔNG CỘNG</span>
+                                </th>
+                                <th class="text-end fs-5"
+                                    th:text="${#numbers.formatDecimal(statistics.totalAmount, 1, #messages.msg('format.decimal.groupingSeparator'), 0, #messages.msg('format.decimal.decimalSeparator')) + ' ' + #messages.msg('currency.vnd')}">
+                                    1,850,000 VNĐ
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
