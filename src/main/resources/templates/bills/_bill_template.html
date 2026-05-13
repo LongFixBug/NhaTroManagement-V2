@@ -3,170 +3,268 @@
 <th:block th:fragment="bill">
     <style>
         .bill-container {
-            border: 1px solid #ccc;
-            padding: 20px;
-            max-width: 800px;
-            /* Adjust as needed */
-            margin: 20px auto;
-            font-family: Arial, sans-serif;
-            /* Or a font closer to the image */
+            font-family: 'Be Vietnam Pro', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: #243336;
+            background: #fffdfa;
+            border-radius: 28px;
+            padding: 28px;
+            box-shadow: 0 24px 60px rgba(87, 107, 101, 0.12);
         }
 
-        .bill-header {
+        .bill-hero {
+            background: linear-gradient(135deg, rgba(223, 243, 234, 0.95), rgba(255, 236, 221, 0.92));
+            border-radius: 24px;
+            padding: 24px;
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
-        .bill-header .info {
-            border: 2px solid red;
-            padding: 10px;
-            text-align: center;
+        .bill-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 14px;
         }
 
-        .bill-header .title {
-            text-align: right;
+        .bill-brand-mark {
+            width: 52px;
+            height: 52px;
+            border-radius: 18px;
+            background: #ffffff;
+            display: grid;
+            place-items: center;
+            color: #4ca98a;
+            font-size: 24px;
         }
 
-        .bill-header .title h3 {
-            font-size: 1.8em;
-            color: red;
-            margin-bottom: 5px;
-        }
-
-        .bill-header .title p {
+        .bill-title {
             margin: 0;
-            font-size: 1.1em;
+            font-size: 38px;
+            line-height: 1;
+            letter-spacing: -0.04em;
         }
 
-        .bill-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
+        .bill-meta {
+            margin: 8px 0 0;
+            color: #647370;
+            font-size: 16px;
         }
 
-        .bill-table th,
-        .bill-table td {
-            border: 1px solid red;
-            /* Red grid lines */
-            padding: 8px;
-            text-align: left;
-        }
-
-        .bill-table th {
-            background-color: #f8f8f8;
-            /* Light grey for header */
-            font-weight: bold;
-        }
-
-        .bill-table td.amount,
-        .bill-table th.amount-header {
-            text-align: right;
-        }
-
-        .bill-footer {
-            text-align: right;
-            margin-top: 30px;
-            font-size: 1.1em;
-        }
-
-        .action-buttons {
-            margin-top: 20px;
+        .bill-total {
+            margin-top: 24px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, rgba(223, 243, 234, 0.76), rgba(255, 236, 221, 0.76));
+            padding: 24px;
             text-align: center;
-            /* Center the buttons */
+        }
+
+        .bill-total-label {
+            color: #647370;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        .bill-total-value {
+            margin-top: 10px;
+            font-size: 60px;
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+        }
+
+        .bill-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(250px, 1fr);
+            gap: 20px;
+            margin-top: 24px;
+            align-items: start;
+        }
+
+        .bill-panel {
+            border: 1px solid rgba(141, 164, 154, 0.2);
+            border-radius: 22px;
+            padding: 20px;
+            background: #ffffff;
+        }
+
+        .bill-panel h3 {
+            margin: 0 0 16px;
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #647370;
+        }
+
+        .bill-line {
+            border-bottom: 1px solid rgba(141, 164, 154, 0.14);
+            padding: 12px 0;
+        }
+
+        .bill-line:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .bill-line-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .bill-line-sub {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: 6px;
+            color: #647370;
+            font-size: 15px;
+        }
+
+        .bill-qr {
+            border: 1px dashed rgba(141, 164, 154, 0.36);
+            border-radius: 22px;
+            padding: 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.76);
+        }
+
+        .bill-qr img {
+            width: 100%;
+            max-width: 220px;
+            border-radius: 18px;
+            border: 1px solid rgba(141, 164, 154, 0.18);
+            background: #ffffff;
+            padding: 8px;
+        }
+
+        @media (max-width: 800px) {
+            .bill-container {
+                padding: 18px;
+            }
+
+            .bill-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .bill-title {
+                font-size: 28px;
+            }
+
+            .bill-total-value {
+                font-size: 34px;
+            }
         }
     </style>
 
     <div class="bill-container">
-        <div class="bill-header">
-            <div class="info">
-                <strong>NHÀ TRỌ ANH ĐÀO 2</strong><br />
-                ĐT: 0979 937 205
-            </div>
-            <div class="title">
-                <h3>HÓA ĐƠN TIỀN TRỌ</h3>
-                <p>Số phòng: <span th:text="${bill.tenant?.name}">[Xem tên người thuê]</span>
-                    <!-- Placeholder: Room info needs to be added to Tenant entity --> </p>
+        <div class="bill-hero">
+            <div>
+                <div class="bill-brand">
+                    <div class="bill-brand-mark">
+                        <i class="bi bi-house-heart-fill"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 800; font-size: 18px;">NHÀ TRỌ ANH ĐÀO 2</div>
+                        <div style="color: #647370; font-size: 14px;">0979 937 205</div>
+                    </div>
+                </div>
+                <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; color: #4ca98a; font-weight: 700;">
+                    Hóa đơn tiền trọ
+                </div>
+                <h2 class="bill-title">Tháng <span th:text="${bill.billMonth}">1</span>/<span th:text="${bill.billYear}">2025</span></h2>
+                <p class="bill-meta">
+                    <strong th:text="${bill.tenant?.name}">P.101</strong>
+                </p>
             </div>
         </div>
 
-        <table class="bill-table">
-            <thead>
-                <tr>
-                    <th>STT</th>
-                    <th>DANH MỤC</th>
-                    <th>SỐ CŨ</th>
-                    <th>SỐ MỚI</th>
-                    <th>TIÊU THỤ</th>
-                    <th class="amount-header">THÀNH TIỀN (VND)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Tiền phòng</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td class="amount" th:text="${#numbers.formatDecimal(bill.roomRent, 0, 'COMMA', 0, 'POINT')}"></td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Điện</td>
-                    <td th:text="${#numbers.formatDecimal(bill.electricityKwhPrevious, 1, 'COMMA', 1, 'POINT')}"></td>
-                    <td th:text="${#numbers.formatDecimal(bill.electricityKwhCurrent, 1, 'COMMA', 1, 'POINT')}"></td>
-                    <td
-                        th:text="${#numbers.formatDecimal(bill.electricityKwhCurrent - bill.electricityKwhPrevious, 1, 'COMMA', 1, 'POINT')}">
-                    </td>
-                    <td class="amount"
-                        th:text="${#numbers.formatDecimal(bill.electricityCost, 0, 'COMMA', 0, 'POINT')}"></td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>Nước</td>
-                    <td th:text="${#numbers.formatDecimal(bill.waterM3Previous, 1, 'COMMA', 1, 'POINT')}"></td>
-                    <td th:text="${#numbers.formatDecimal(bill.waterM3Current, 1, 'COMMA', 1, 'POINT')}"></td>
-                    <td
-                        th:text="${#numbers.formatDecimal(bill.waterM3Current - bill.waterM3Previous, 1, 'COMMA', 1, 'POINT')}">
-                    </td>
-                    <td class="amount" th:text="${#numbers.formatDecimal(bill.waterCost, 0, 'COMMA', 0, 'POINT')}"></td>
-                </tr>
-                <tr>
-                    <td>4</td>
-                    <td>Mạng</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td class="amount" th:text="${#numbers.formatDecimal(bill.wifiFee, 0, 'COMMA', 0, 'POINT')}"></td>
-                </tr>
-                <tr>
-                    <td>5</td>
-                    <td>Rác</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td class="amount" th:text="${#numbers.formatDecimal(bill.trashFee, 0, 'COMMA', 0, 'POINT')}"></td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="5" style="text-align: right; font-weight: bold;">CỘNG</td>
-                    <td class="amount" style="font-weight: bold;"
-                        th:text="${#numbers.formatDecimal(bill.totalAmount, 0, 'COMMA', 0, 'POINT')}"></td>
-                </tr>
-            </tfoot>
-        </table>
-
-        <div class="bill-footer" style="text-align: right; margin-top: 10px; margin-bottom: 20px; font-size: 1.1em;">
-            Tháng <span th:text="${bill.billMonth}"></span> Năm <span th:text="${bill.billYear}"></span>
+        <div class="bill-total">
+            <div class="bill-total-label">Tổng cộng phải thanh toán</div>
+            <div class="bill-total-value"
+                th:text="${T(com.example.nhatromanagement.util.NumberFormatUtils).formatSmart(bill.totalAmount) + ' ' + #messages.msg('currency.vnd')}">
+                0 VNĐ
+            </div>
         </div>
 
-        <div
-            style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 20px; padding-top: 20px; border-top: 1px dashed #ccc;">
-            <img th:src="@{/images/qr_payment.jpg}" alt="QR Payment"
-                style="max-width: 250px; height: auto; border: 1px solid red; background: white;" />
-            <div style="margin-top: 5px; color: red; font-weight: bold; font-size: 1.1em;">MÃ QR THANH TOÁN</div>
+        <div class="bill-layout">
+            <div class="bill-panel">
+                <h3>Chi tiết các khoản thu</h3>
+
+                <div class="bill-line">
+                    <div class="bill-line-top">
+                        <span>Tiền phòng</span>
+                        <span th:text="${T(com.example.nhatromanagement.util.NumberFormatUtils).formatSmart(bill.roomRent) + ' ' + #messages.msg('currency.vnd')}">0 VNĐ</span>
+                    </div>
+                </div>
+
+                <div class="bill-line">
+                    <div class="bill-line-top">
+                        <span>Tiền điện</span>
+                        <span th:text="${T(com.example.nhatromanagement.util.NumberFormatUtils).formatSmart(bill.electricityCost) + ' ' + #messages.msg('currency.vnd')}">0 VNĐ</span>
+                    </div>
+                    <div class="bill-line-sub">
+                        <span>
+                            <span th:text="${T(com.example.nhatromanagement.util.NumberFormatUtils).formatSmart(bill.electricityKwhPrevious)}">0</span>
+                            →
+                            <span th:text="${T(com.example.nhatromanagement.util.NumberFormatUtils).formatSmart(bill.electricityKwhCurrent)}">0</span>
+                            kWh
+                            (<span th:text="${T(com.example.nhatromanagement.util.NumberFormatUtils).formatSmart(bill.electricityKwhCurrent - bill.electricityKwhPrevious)}">0</span>)
+                        </span>
+                        <span th:text="${T(com.example.nhatromanagement.util.NumberFormatUtils).formatSmart(electricityPriceUnit) + ' ₫/kWh'}">0 ₫/kWh</span>
+                    </div>
+                </div>
+
+                <div class="bill-line">
+                    <div class="bill-line-top">
+                        <span>Tiền nước</span>
+                        <span th:text="${T(com.example.nhatromanagement.util.NumberFormatUtils).formatSmart(bill.waterCost) + ' ' + #messages.msg('currency.vnd')}">0 VNĐ</span>
+                    </div>
+                    <div class="bill-line-sub">
+                        <span>
+                            <span th:text="${T(com.example.nhatromanagement.util.NumberFormatUtils).formatSmart(bill.waterM3Previous)}">0</span>
+                            →
+                            <span th:text="${T(com.example.nhatromanagement.util.NumberFormatUtils).formatSmart(bill.waterM3Current)}">0</span>
+                            m³
+                            (<span th:text="${T(com.example.nhatromanagement.util.NumberFormatUtils).formatSmart(bill.waterM3Current - bill.waterM3Previous)}">0</span>)
+                        </span>
+                        <span th:text="${T(com.example.nhatromanagement.util.NumberFormatUtils).formatSmart(waterPriceUnit) + ' ₫/m³'}">0 ₫/m³</span>
+                    </div>
+                </div>
+
+                <div class="bill-line" th:if="${bill.wifiFee > 0}">
+                    <div class="bill-line-top">
+                        <span>Phí WiFi</span>
+                        <span th:text="${T(com.example.nhatromanagement.util.NumberFormatUtils).formatSmart(bill.wifiFee) + ' ' + #messages.msg('currency.vnd')}">0 VNĐ</span>
+                    </div>
+                </div>
+
+                <div class="bill-line">
+                    <div class="bill-line-top">
+                        <span>Phí rác</span>
+                        <span th:text="${T(com.example.nhatromanagement.util.NumberFormatUtils).formatSmart(bill.trashFee) + ' ' + #messages.msg('currency.vnd')}">0 VNĐ</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bill-panel">
+                <div class="bill-qr">
+                    <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; color: #647370; font-weight: 700; margin-bottom: 12px;">
+                        Quét mã để xem thông tin
+                    </div>
+                    <img th:src="@{/images/qr_payment.jpg}" alt="QR Payment" />
+                    <div style="margin-top: 14px; font-weight: 700; font-size: 15px;">Nội dung chuyển khoản gợi ý</div>
+                    <div style="margin-top: 6px; color: #647370; font-size: 14px;">
+                        <strong th:text="${bill.tenant?.name + ' tiền trọ tháng ' + bill.billMonth + '/' + bill.billYear}">P101 tiền trọ tháng 1/2025</strong>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </th:block>

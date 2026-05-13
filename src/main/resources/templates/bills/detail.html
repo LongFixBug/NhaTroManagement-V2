@@ -1,23 +1,37 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-    th:replace="~{fragments/_layout :: html(pageTitle=${pageTitle}, content=~{::content})}" lang="en">
+    th:replace="~{fragments/_layout :: html(pageTitle=${pageTitle}, content=~{::content})}" lang="vi">
 
 <th:block th:fragment="content">
-    <div th:replace="~{bills/_bill_template :: bill}"></div>
+    <section class="app-page receipt-shell">
+        <div class="page-hero page-hero-tight">
+            <div>
+                <div class="page-kicker">
+                    <i class="bi bi-receipt"></i>
+                    <span>Chi tiết hóa đơn</span>
+                </div>
+                <h1 class="page-title" th:text="${pageTitle}">Bill detail</h1>
+                <p class="page-subtitle">Receipt được tối ưu để xem nhanh trên màn hình và chụp/xuất ảnh gửi khách thuê.</p>
+            </div>
+            <div class="page-actions">
+                <a th:href="@{/bills/tenant/{tenantId}(tenantId=${bill.tenant.id})}" class="btn btn-outline-secondary"
+                    th:text="#{bill.details.backToTenantBillsButton}">Back to Tenant's Bills</a>
+                <a th:href="@{/bills}" class="btn btn-outline-secondary"
+                    th:text="#{bill.details.backToAllBillsButton}">Back to All Bills</a>
+                <a th:href="@{/bills/edit/{id}(id=${bill.id})}" class="btn btn-outline-warning" th:text="#{button.edit}">Edit</a>
+                <form th:action="@{/bills/delete/{id}(id=${bill.id})}" method="post" class="d-inline"
+                    th:onsubmit="'return confirm(\'' + #messages.msg('confirm.delete.bill.text', ${bill.id}) + '\');'">
+                    <button type="submit" class="btn btn-outline-danger" th:text="#{button.delete}">Delete</button>
+                </form>
+                <button type="button" onclick="downloadBillImage()" class="btn btn-primary">Tải ảnh hóa đơn</button>
+            </div>
+        </div>
 
-    <div class="action-buttons">
-        <a th:href="@{/bills/edit/{id}(id=${bill.id})}" class="btn btn-warning me-2" th:text="#{button.edit}">Edit</a>
-        <form th:action="@{/bills/delete/{id}(id=${bill.id})}" method="post" style="display: inline-block;"
-            th:onsubmit="'return confirm(\'' + #messages.msg('confirm.delete.bill.text', ${bill.id}) + '\');'">
-            <button type="submit" class="btn btn-danger me-2" th:text="#{button.delete}">Delete</button>
-        </form>
-        <button type="button" onclick="downloadBillImage()" class="btn btn-success me-2">Tải ảnh hóa đơn</button>
-        <a th:href="@{/bills/tenant/{tenantId}(tenantId=${bill.tenant.id})}" class="btn btn-secondary me-2"
-            th:text="#{bill.details.backToTenantBillsButton}">Back to Tenant's Bills</a>
-        <a th:href="@{/bills}" class="btn btn-info" th:text="#{bill.details.backToAllBillsButton}">Back to All Bills</a>
-    </div>
+        <div class="receipt-card">
+            <div th:replace="~{bills/_bill_template :: bill}"></div>
+        </div>
+    </section>
 
-    <!-- html2canvas Library -->
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script th:inline="javascript">
         function downloadBillImage() {
@@ -26,13 +40,13 @@
             const roomName = roomNameRaw || 'bill';
             const month = /*[[${bill.billMonth}]]*/ 1;
             const year = /*[[${bill.billYear}]]*/ 2024;
-            const fileName = `HoaDon_${roomName}_Thang${month}_Nam${year}.png`;
+            const fileName = `HoaDon_${roomName}_Thang${month}_Nam${year}.png`.replace(/\s+/g, '_');
 
             html2canvas(billContainer, {
-                scale: 2, // Higher quality
+                scale: 2,
                 useCORS: true,
                 logging: false,
-                backgroundColor: "#ffffff"
+                backgroundColor: '#ffffff'
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = fileName;
@@ -41,7 +55,6 @@
             });
         }
     </script>
-
 </th:block>
 
 </html>
