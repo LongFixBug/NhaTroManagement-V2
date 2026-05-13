@@ -24,6 +24,10 @@ public interface BillService {
 
     void deleteBill(Long billId);
 
+    void bulkUpdateStatus(List<Long> billIds, boolean isPaid);
+
+    void bulkDelete(List<Long> billIds);
+
     Optional<Bill> getLatestBillForTenant(Long tenantId);
 
     /**

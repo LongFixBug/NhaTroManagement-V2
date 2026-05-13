@@ -4,6 +4,7 @@ import com.example.nhatromanagement.model.Setting;
 import com.example.nhatromanagement.repository.SettingRepository;
 import com.example.nhatromanagement.service.SettingService;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class SettingServiceImpl implements SettingService {
 
@@ -61,8 +63,8 @@ public class SettingServiceImpl implements SettingService {
             try {
                 return Double.parseDouble(value);
             } catch (NumberFormatException e) {
-                System.err.println("Error parsing double value for setting key '" + key + "': " + value);
-                return null; // Or throw a custom exception
+                log.warn("Error parsing double value for setting key '{}': {}", key, value);
+                return null;
             }
         });
     }

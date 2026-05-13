@@ -1,162 +1,46 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/_layout :: html(pageTitle=${pageTitle}, content=~{::content})}" lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{fragments/_layout :: html(pageTitle=${pageTitle}, content=~{::content})}" lang="en">
 
 <th:block th:fragment="content">
-    <style>
-        .bill-container {
-            border: 1px solid #ccc;
-            padding: 20px;
-            max-width: 800px; /* Adjust as needed */
-            margin: 20px auto;
-            font-family: Arial, sans-serif; /* Or a font closer to the image */
-        }
-        .bill-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
-        }
-        .bill-header .info {
-            border: 2px solid red;
-            padding: 10px;
-            text-align: center;
-        }
-        .bill-header .title {
-            text-align: right;
-        }
-        .bill-header .title h3 {
-            font-size: 1.8em;
-            color: red;
-            margin-bottom: 5px;
-        }
-        .bill-header .title p {
-            margin: 0;
-            font-size: 1.1em;
-        }
-        .bill-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        .bill-table th, .bill-table td {
-            border: 1px solid red; /* Red grid lines */
-            padding: 8px;
-            text-align: left;
-        }
-        .bill-table th {
-            background-color: #f8f8f8; /* Light grey for header */
-            font-weight: bold;
-        }
-        .bill-table td.amount, .bill-table th.amount-header {
-            text-align: right;
-        }
-        .bill-footer {
-            text-align: right;
-            margin-top: 30px;
-            font-size: 1.1em;
-        }
-        .action-buttons {
-            margin-top: 20px;
-            text-align: center; /* Center the buttons */
-        }
-    </style>
-
-    <div class="bill-container">
-        <div class="bill-header">
-            <div class="info">
-                <strong>NHÀ TRỌ ANH ĐÀO 2</strong><br/>
-                ĐT: 0979 937 205
-            </div>
-            <div class="title">
-                <h3>HÓA ĐƠN TIỀN TRỌ</h3>
-                <p>Số phòng: <span th:text="${bill.tenant?.name}">[Xem tên người thuê]</span> <!-- Placeholder: Room info needs to be added to Tenant entity --> </p>
-            </div>
-        </div>
-
-        <table class="bill-table">
-            <thead>
-                <tr>
-                    <th>STT</th>
-                    <th>DANH MỤC</th>
-                    <th>SỐ CŨ</th>
-                    <th>SỐ MỚI</th>
-                    <th>TIÊU THỤ</th>
-                    <th class="amount-header">THÀNH TIỀN (VND)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Tiền phòng</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td class="amount" th:text="${#numbers.formatDecimal(bill.roomRent, 0, 'COMMA', 0, 'POINT')}"></td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Điện</td>
-                    <td th:text="${#numbers.formatDecimal(bill.electricityKwhPrevious, 1, 'COMMA', 1, 'POINT')}"></td>
-                    <td th:text="${#numbers.formatDecimal(bill.electricityKwhCurrent, 1, 'COMMA', 1, 'POINT')}"></td>
-                    <td th:text="${#numbers.formatDecimal(bill.electricityKwhCurrent - bill.electricityKwhPrevious, 1, 'COMMA', 1, 'POINT')}"></td>
-                    <td class="amount" th:text="${#numbers.formatDecimal(bill.electricityCost, 0, 'COMMA', 0, 'POINT')}"></td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>Nước</td>
-                    <td th:text="${#numbers.formatDecimal(bill.waterM3Previous, 1, 'COMMA', 1, 'POINT')}"></td>
-                    <td th:text="${#numbers.formatDecimal(bill.waterM3Current, 1, 'COMMA', 1, 'POINT')}"></td>
-                    <td th:text="${#numbers.formatDecimal(bill.waterM3Current - bill.waterM3Previous, 1, 'COMMA', 1, 'POINT')}"></td>
-                    <td class="amount" th:text="${#numbers.formatDecimal(bill.waterCost, 0, 'COMMA', 0, 'POINT')}"></td>
-                </tr>
-                <tr>
-                    <td>4</td>
-                    <td>Mạng</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td class="amount" th:text="${#numbers.formatDecimal(bill.wifiFee, 0, 'COMMA', 0, 'POINT')}"></td>
-                </tr>
-                <tr>
-                    <td>5</td>
-                    <td>Rác</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td class="amount" th:text="${#numbers.formatDecimal(bill.trashFee, 0, 'COMMA', 0, 'POINT')}"></td>
-                </tr>
-                <!-- Add more empty rows if needed to match the 10 rows in the image -->
-                <tr th:each="i : ${#numbers.sequence(6, 10)}">
-                    <td th:text="${i}"></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="5" style="text-align: right; font-weight: bold;">CỘNG</td>
-                    <td class="amount" style="font-weight: bold;" th:text="${#numbers.formatDecimal(bill.totalAmount, 0, 'COMMA', 0, 'POINT')}"></td>
-                </tr>
-            </tfoot>
-        </table>
-
-        <div class="bill-footer">
-            Tháng <span th:text="${bill.billMonth}"></span> Năm <span th:text="${bill.billYear}"></span>
-        </div>
-    </div>
+    <div th:replace="~{bills/_bill_template :: bill}"></div>
 
     <div class="action-buttons">
         <a th:href="@{/bills/edit/{id}(id=${bill.id})}" class="btn btn-warning me-2" th:text="#{button.edit}">Edit</a>
-        <form th:action="@{/bills/delete/{id}(id=${bill.id})}" method="post" style="display: inline-block;" th:onsubmit="'return confirm(\'' + #messages.msg('confirm.delete.bill.text', ${bill.id}) + '\');'">
+        <form th:action="@{/bills/delete/{id}(id=${bill.id})}" method="post" style="display: inline-block;"
+            th:onsubmit="'return confirm(\'' + #messages.msg('confirm.delete.bill.text', ${bill.id}) + '\');'">
             <button type="submit" class="btn btn-danger me-2" th:text="#{button.delete}">Delete</button>
         </form>
-        <a th:href="@{/bills/export/pdf/{billId}(billId=${bill.id})}" class="btn btn-success me-2" th:text="#{button.export.pdf}">Export to PDF</a>
-        <a th:href="@{/bills/tenant/{tenantId}(tenantId=${bill.tenant.id})}" class="btn btn-secondary me-2" th:text="#{bill.details.backToTenantBillsButton}">Back to Tenant's Bills</a>
+        <button type="button" onclick="downloadBillImage()" class="btn btn-success me-2">Tải ảnh hóa đơn</button>
+        <a th:href="@{/bills/tenant/{tenantId}(tenantId=${bill.tenant.id})}" class="btn btn-secondary me-2"
+            th:text="#{bill.details.backToTenantBillsButton}">Back to Tenant's Bills</a>
         <a th:href="@{/bills}" class="btn btn-info" th:text="#{bill.details.backToAllBillsButton}">Back to All Bills</a>
     </div>
+
+    <!-- html2canvas Library -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script th:inline="javascript">
+        function downloadBillImage() {
+            const billContainer = document.querySelector('.bill-container');
+            const roomNameRaw = /*[[${bill.tenant?.name}]]*/ 'bill';
+            const roomName = roomNameRaw || 'bill';
+            const month = /*[[${bill.billMonth}]]*/ 1;
+            const year = /*[[${bill.billYear}]]*/ 2024;
+            const fileName = `HoaDon_${roomName}_Thang${month}_Nam${year}.png`;
+
+            html2canvas(billContainer, {
+                scale: 2, // Higher quality
+                useCORS: true,
+                logging: false,
+                backgroundColor: "#ffffff"
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = fileName;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+    </script>
 
 </th:block>
 

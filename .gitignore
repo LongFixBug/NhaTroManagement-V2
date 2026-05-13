@@ -1,0 +1,9 @@
+.DS_Store
+
+/target/
+/BOOT-INF/
+
+*.class
+*.jar
+*.war
+*.ear

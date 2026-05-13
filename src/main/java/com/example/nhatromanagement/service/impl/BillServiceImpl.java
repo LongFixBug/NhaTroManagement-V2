@@ -162,6 +162,22 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
+    @Transactional
+    public void bulkUpdateStatus(List<Long> billIds, boolean isPaid) {
+        List<Bill> bills = billRepository.findAllById(billIds);
+        for (Bill bill : bills) {
+            bill.setPaid(isPaid);
+        }
+        billRepository.saveAll(bills);
+    }
+
+    @Override
+    @Transactional
+    public void bulkDelete(List<Long> billIds) {
+        billRepository.deleteAllById(billIds);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Optional<Bill> getLatestBillForTenant(Long tenantId) {
         Tenant tenant = tenantRepository.findById(tenantId)

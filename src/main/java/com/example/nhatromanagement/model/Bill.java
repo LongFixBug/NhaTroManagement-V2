@@ -50,13 +50,17 @@ public class Bill {
         if (electricityKwhCurrent >= electricityKwhPrevious) {
             this.electricityCost = (this.electricityKwhCurrent - this.electricityKwhPrevious) * electricityPricePerKwh;
         } else {
-            this.electricityCost = 0; // Or handle error/edge case (e.g. meter reset)
+            throw new IllegalStateException(
+                "Chỉ số điện mới (" + electricityKwhCurrent + ") không thể nhỏ hơn chỉ số cũ (" + electricityKwhPrevious + ")"
+            );
         }
 
         if (waterM3Current >= waterM3Previous) {
             this.waterCost = (this.waterM3Current - this.waterM3Previous) * waterPricePerM3;
         } else {
-            this.waterCost = 0; // Or handle error/edge case
+            throw new IllegalStateException(
+                "Chỉ số nước mới (" + waterM3Current + ") không thể nhỏ hơn chỉ số cũ (" + waterM3Previous + ")"
+            );
         }
 
         this.totalAmount = this.roomRent + this.electricityCost + this.waterCost + this.trashFee + this.wifiFee;

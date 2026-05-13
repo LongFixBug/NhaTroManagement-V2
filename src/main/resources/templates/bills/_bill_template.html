@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="bill">
+    <style>
+        .bill-container {
+            border: 1px solid #ccc;
+            padding: 20px;
+            max-width: 800px;
+            /* Adjust as needed */
+            margin: 20px auto;
+            font-family: Arial, sans-serif;
+            /* Or a font closer to the image */
+        }
+
+        .bill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .bill-header .info {
+            border: 2px solid red;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .bill-header .title {
+            text-align: right;
+        }
+
+        .bill-header .title h3 {
+            font-size: 1.8em;
+            color: red;
+            margin-bottom: 5px;
+        }
+
+        .bill-header .title p {
+            margin: 0;
+            font-size: 1.1em;
+        }
+
+        .bill-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .bill-table th,
+        .bill-table td {
+            border: 1px solid red;
+            /* Red grid lines */
+            padding: 8px;
+            text-align: left;
+        }
+
+        .bill-table th {
+            background-color: #f8f8f8;
+            /* Light grey for header */
+            font-weight: bold;
+        }
+
+        .bill-table td.amount,
+        .bill-table th.amount-header {
+            text-align: right;
+        }
+
+        .bill-footer {
+            text-align: right;
+            margin-top: 30px;
+            font-size: 1.1em;
+        }
+
+        .action-buttons {
+            margin-top: 20px;
+            text-align: center;
+            /* Center the buttons */
+        }
+    </style>
+
+    <div class="bill-container">
+        <div class="bill-header">
+            <div class="info">
+                <strong>NHÀ TRỌ ANH ĐÀO 2</strong><br />
+                ĐT: 0979 937 205
+            </div>
+            <div class="title">
+                <h3>HÓA ĐƠN TIỀN TRỌ</h3>
+                <p>Số phòng: <span th:text="${bill.tenant?.name}">[Xem tên người thuê]</span>
+                    <!-- Placeholder: Room info needs to be added to Tenant entity --> </p>
+            </div>
+        </div>
+
+        <table class="bill-table">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>DANH MỤC</th>
+                    <th>SỐ CŨ</th>
+                    <th>SỐ MỚI</th>
+                    <th>TIÊU THỤ</th>
+                    <th class="amount-header">THÀNH TIỀN (VND)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Tiền phòng</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="amount" th:text="${#numbers.formatDecimal(bill.roomRent, 0, 'COMMA', 0, 'POINT')}"></td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Điện</td>
+                    <td th:text="${#numbers.formatDecimal(bill.electricityKwhPrevious, 1, 'COMMA', 1, 'POINT')}"></td>
+                    <td th:text="${#numbers.formatDecimal(bill.electricityKwhCurrent, 1, 'COMMA', 1, 'POINT')}"></td>
+                    <td
+                        th:text="${#numbers.formatDecimal(bill.electricityKwhCurrent - bill.electricityKwhPrevious, 1, 'COMMA', 1, 'POINT')}">
+                    </td>
+                    <td class="amount"
+                        th:text="${#numbers.formatDecimal(bill.electricityCost, 0, 'COMMA', 0, 'POINT')}"></td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Nước</td>
+                    <td th:text="${#numbers.formatDecimal(bill.waterM3Previous, 1, 'COMMA', 1, 'POINT')}"></td>
+                    <td th:text="${#numbers.formatDecimal(bill.waterM3Current, 1, 'COMMA', 1, 'POINT')}"></td>
+                    <td
+                        th:text="${#numbers.formatDecimal(bill.waterM3Current - bill.waterM3Previous, 1, 'COMMA', 1, 'POINT')}">
+                    </td>
+                    <td class="amount" th:text="${#numbers.formatDecimal(bill.waterCost, 0, 'COMMA', 0, 'POINT')}"></td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Mạng</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="amount" th:text="${#numbers.formatDecimal(bill.wifiFee, 0, 'COMMA', 0, 'POINT')}"></td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Rác</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="amount" th:text="${#numbers.formatDecimal(bill.trashFee, 0, 'COMMA', 0, 'POINT')}"></td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5" style="text-align: right; font-weight: bold;">CỘNG</td>
+                    <td class="amount" style="font-weight: bold;"
+                        th:text="${#numbers.formatDecimal(bill.totalAmount, 0, 'COMMA', 0, 'POINT')}"></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="bill-footer" style="text-align: right; margin-top: 10px; margin-bottom: 20px; font-size: 1.1em;">
+            Tháng <span th:text="${bill.billMonth}"></span> Năm <span th:text="${bill.billYear}"></span>
+        </div>
+
+        <div
+            style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 20px; padding-top: 20px; border-top: 1px dashed #ccc;">
+            <img th:src="@{/images/qr_payment.jpg}" alt="QR Payment"
+                style="max-width: 250px; height: auto; border: 1px solid red; background: white;" />
+            <div style="margin-top: 5px; color: red; font-weight: bold; font-size: 1.1em;">MÃ QR THANH TOÁN</div>
+        </div>
+    </div>
+</th:block>
+
+</html>

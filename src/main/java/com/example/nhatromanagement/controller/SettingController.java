@@ -3,6 +3,7 @@ package com.example.nhatromanagement.controller;
 import com.example.nhatromanagement.model.Setting;
 import com.example.nhatromanagement.service.SettingService;
 import com.example.nhatromanagement.service.impl.SettingServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
@@ -18,6 +19,7 @@ import java.util.Locale;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Controller
 @RequestMapping("/settings")
 public class SettingController {
@@ -84,8 +86,7 @@ public class SettingController {
             redirectAttributes.addFlashAttribute("successMessage",
                     messageSource.getMessage("settings.success.updated", null, LocaleContextHolder.getLocale()));
         } catch (Exception e) {
-            System.err.println("Error saving settings: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error saving settings", e);
             redirectAttributes.addFlashAttribute("errorMessage",
                     messageSource.getMessage("settings.error.updated", null, LocaleContextHolder.getLocale()));
         }

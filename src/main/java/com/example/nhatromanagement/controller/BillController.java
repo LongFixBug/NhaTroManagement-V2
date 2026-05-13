@@ -14,13 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import com.example.nhatromanagement.service.PdfService;
 
-import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -32,16 +26,14 @@ public class BillController {
     private final BillService billService;
     private final TenantService tenantService;
     private final MessageSource messageSource;
-    private final PdfService pdfService;
     private final SettingService settingService; // Added SettingService field
 
     @Autowired
     public BillController(BillService billService, TenantService tenantService, MessageSource messageSource,
-            PdfService pdfService, SettingService settingService) { // Added SettingService to constructor
+            SettingService settingService) { // Added SettingService to constructor
         this.billService = billService;
         this.tenantService = tenantService;
         this.messageSource = messageSource;
-        this.pdfService = pdfService;
         this.settingService = settingService; // Initialize SettingService
     }
 
@@ -90,6 +82,12 @@ public class BillController {
         model.addAttribute("selectedMonth", month);
         model.addAttribute("selectedYear", year);
         model.addAttribute("selectedTenantId", tenantId);
+
+        // Fetch and add dynamic prices to the model for hidden snippet rendering
+        double electricityPriceUnit = settingService.getDoubleSettingValue("ELECTRICITY_PRICE").orElse(0.0);
+        double waterPriceUnit = settingService.getDoubleSettingValue("WATER_PRICE").orElse(0.0);
+        model.addAttribute("electricityPriceUnit", electricityPriceUnit);
+        model.addAttribute("waterPriceUnit", waterPriceUnit);
 
         // Get unique years from all bills for year dropdown
         List<Bill> allBills = billService.getAllBills();
@@ -225,6 +223,41 @@ public class BillController {
             return "redirect:/tenants";
         }
 
+        // Validate meter readings: current >= previous
+        String validationError = null;
+        if (bill.getId() != null) {
+            // For updates, compare against the existing bill's previous values
+            var existingBill = billService.getBillById(bill.getId()).orElse(null);
+            if (existingBill != null) {
+                if (bill.getElectricityKwhCurrent() < existingBill.getElectricityKwhPrevious()) {
+                    validationError = messageSource.getMessage("error.bill.elec.current.min",
+                            new Object[] { existingBill.getElectricityKwhPrevious() }, LocaleContextHolder.getLocale());
+                } else if (bill.getWaterM3Current() < existingBill.getWaterM3Previous()) {
+                    validationError = messageSource.getMessage("error.bill.water.current.min",
+                            new Object[] { existingBill.getWaterM3Previous() }, LocaleContextHolder.getLocale());
+                }
+            }
+        } else {
+            // For new bills, previous values come from the form (pre-filled from latest bill)
+            if (bill.getElectricityKwhCurrent() < bill.getElectricityKwhPrevious()) {
+                validationError = messageSource.getMessage("error.bill.elec.current.min",
+                        new Object[] { bill.getElectricityKwhPrevious() }, LocaleContextHolder.getLocale());
+            } else if (bill.getWaterM3Current() < bill.getWaterM3Previous()) {
+                validationError = messageSource.getMessage("error.bill.water.current.min",
+                        new Object[] { bill.getWaterM3Previous() }, LocaleContextHolder.getLocale());
+            }
+        }
+        if (validationError != null) {
+            redirectAttributes.addFlashAttribute("errorMessage", validationError);
+            tenantService.getTenantById(bill.getTenant().getId())
+                    .ifPresent(t -> redirectAttributes.addFlashAttribute("tenantName", t.getName()));
+            redirectAttributes.addFlashAttribute("bill", bill);
+            String redirectPath = bill.getId() != null
+                    ? "redirect:/bills/edit/" + bill.getId()
+                    : "redirect:/bills/add/" + bill.getTenant().getId();
+            return redirectPath;
+        }
+
         if (result.hasErrors()) {
             // Repopulate tenantName for the form
             tenantService.getTenantById(bill.getTenant().getId())
@@ -280,14 +313,14 @@ public class BillController {
         }
     }
 
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String deleteBill(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         Optional<Bill> billOptional = billService.getBillById(id);
         if (billOptional.isEmpty()) {
             String errorMsg = messageSource.getMessage("error.bill.notfound", new Object[] { id },
                     LocaleContextHolder.getLocale());
             redirectAttributes.addFlashAttribute("errorMessage", errorMsg);
-            return "redirect:/bills/all"; // Or a more appropriate error page/redirect
+            return "redirect:/bills";
         }
 
         Long tenantId = billOptional.get().getTenant().getId();
@@ -312,7 +345,42 @@ public class BillController {
         return "redirect:/bills/tenant/" + tenantId;
     }
 
+    @PostMapping("/bulk-update-status")
+    public String bulkUpdateStatus(@RequestParam("billIds") List<Long> billIds,
+            @RequestParam("isPaid") boolean isPaid,
+            RedirectAttributes redirectAttributes) {
+        if (billIds != null && !billIds.isEmpty()) {
+            try {
+                billService.bulkUpdateStatus(billIds, isPaid);
+                String msgKey = isPaid ? "success.bill.bulk.paid" : "success.bill.bulk.unpaid";
+                String successMsg = messageSource.getMessage(msgKey, new Object[] { billIds.size() },
+                        LocaleContextHolder.getLocale());
+                redirectAttributes.addFlashAttribute("successMessage", successMsg);
+            } catch (Exception e) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Error updating bills: " + e.getMessage());
+            }
+        }
+        return "redirect:/bills";
+    }
+
+    @PostMapping("/bulk-delete")
+    public String bulkDelete(@RequestParam("billIds") List<Long> billIds,
+            RedirectAttributes redirectAttributes) {
+        if (billIds != null && !billIds.isEmpty()) {
+            try {
+                billService.bulkDelete(billIds);
+                String successMsg = messageSource.getMessage("success.bill.bulk.deleted",
+                        new Object[] { billIds.size() }, LocaleContextHolder.getLocale());
+                redirectAttributes.addFlashAttribute("successMessage", successMsg);
+            } catch (Exception e) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Error deleting bills: " + e.getMessage());
+            }
+        }
+        return "redirect:/bills";
+    }
+
     @GetMapping("/{id}")
+
     public String viewBill(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
         Optional<Bill> billOptional = billService.getBillById(id);
         if (billOptional.isEmpty()) {
@@ -336,49 +404,6 @@ public class BillController {
                         new Object[] { bill.getTenant().getName(), bill.getBillMonth(), bill.getBillYear() },
                         LocaleContextHolder.getLocale()));
         return "bills/detail";
-    }
-
-    @GetMapping("/export/pdf/{billId}")
-    public ResponseEntity<byte[]> exportBillToPdf(@PathVariable("billId") Long billId,
-            RedirectAttributes redirectAttributes) {
-        Optional<Bill> billOptional = billService.getBillById(billId);
-        if (billOptional.isEmpty()) {
-            // This path won't be hit if called from a valid bill's detail page usually,
-            // but good for direct URL access attempts.
-            // Consider how to communicate this error - redirectAttributes won't work with
-            // ResponseEntity.
-            // For simplicity, returning NOT_FOUND. A proper error page or JSON response
-            // might be better.
-            return ResponseEntity.notFound().build();
-        }
-
-        Bill bill = billOptional.get();
-        try {
-            ByteArrayOutputStream pdfOutputStream = pdfService.generateBillPdf(bill);
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_PDF);
-            String filename = String.format("bill_%s_%d_%d.pdf", bill.getTenant().getName().replaceAll("\\s+", "_"),
-                    bill.getBillMonth(), bill.getBillYear());
-            headers.setContentDispositionFormData("attachment", filename);
-            headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
-
-            return new ResponseEntity<>(pdfOutputStream.toByteArray(), headers, HttpStatus.OK);
-        } catch (Exception e) {
-            // Log the error e.printStackTrace(); or use a logger
-            // Redirecting with error message is tricky here. Returning an internal server
-            // error.
-            // A user-friendly error page or a JSON error response would be better for
-            // production.
-            System.err.println("Error generating PDF for bill ID " + billId + ": " + e.getMessage());
-            e.printStackTrace();
-            // Optionally, redirect to an error page or back to bill details with a flash
-            // message if possible,
-            // but ResponseEntity makes direct redirection with flash attributes hard.
-            // For now, send an error status.
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Or a generic error message in
-                                                                                       // bytes
-        }
     }
 
     @GetMapping("/statistics")

@@ -20,7 +20,6 @@ public class PdfServiceImpl implements PdfService {
     private final TemplateEngine templateEngine;
     private final MessageSource messageSource;
 
-
     @Autowired
     public PdfServiceImpl(TemplateEngine templateEngine, MessageSource messageSource) {
         this.templateEngine = templateEngine;
@@ -45,18 +44,15 @@ public class PdfServiceImpl implements PdfService {
         // Example of resolving a title message to pass to the context
         // The template can also resolve messages itself using #{...}
         context.setVariable("pdfTitle", messageSource.getMessage("bill.pdf.title",
-                new Object[]{bill.getTenant().getName(), bill.getBillMonth(), bill.getBillYear()},
+                new Object[] { bill.getTenant().getName(), bill.getBillMonth(), bill.getBillYear() },
                 locale));
 
         String htmlContent = templateEngine.process("bills/pdf_template", context);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ITextRenderer renderer = new ITextRenderer();
-        // It's good practice to set a base URL if your HTML references external resources like CSS files or images
-        // For local resources, you might need to construct a file:/// URL
-        // String baseUrl = Paths.get("src/main/resources/templates/").toUri().toURL().toString();
-        // renderer.setDocumentFromString(htmlContent, baseUrl);
-        renderer.setDocumentFromString(htmlContent);
+        String baseUrl = new java.io.File("src/main/resources/static/images/").getAbsoluteFile().toURI().toString();
+        renderer.setDocumentFromString(htmlContent, baseUrl);
         renderer.layout();
         renderer.createPDF(outputStream);
         outputStream.close();
